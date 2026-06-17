@@ -1,0 +1,5 @@
+{
+  "dl": "https://github.com/enthusiasticgeek/kosh-index/releases/download/{name}-v{version}/{name}-{version}.tar.gz",
+  "api": "https://enthusiasticgeek.github.io/kosh-index",
+  "auth-required": false
+}
