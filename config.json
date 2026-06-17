@@ -1,10 +1,5 @@
 {
   "dl": "https://github.com/enthusiasticgeek/kosh-index/releases/download/{name}-v{version}/{name}-{version}.tar.gz",
   "api": "https://enthusiasticgeek.github.io/kosh-index",
-  "auth-required": false,
-  "governance": {
-    "allowed_publishers": ["enthusiasticgeek"],
-    "governance_url": "https://github.com/enthusiasticgeek/kosh-index",
-    "note": "v1: enthusiasticgeek is the sole write authority. Registry URL and governance model will change when vani adoption warrants a committee-managed standalone domain."
-  }
+  "auth-required": false
 }
