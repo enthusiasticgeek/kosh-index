@@ -220,11 +220,9 @@ jurisdiction.
 
 **Patent matters** may be brought directly to federal court without exhausting steps 1–3.
 
-> **Note on the Operator's immigration status**: The Operator resides in the
-> United States under valid work authorization. US jurisdiction is appropriate
-> because the Project was created and is maintained in the US, and the Operator
-> is physically domiciled in the US. The temporary nature of a US immigration
-> status does not affect legal domicile for contract purposes under US law.
+> The Operator is domiciled in the United States. US jurisdiction is
+> appropriate because the Registry was created and is maintained in the US
+> and is hosted on GitHub, Inc. (a US company).
 
 ---
 
