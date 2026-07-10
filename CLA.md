@@ -2,7 +2,7 @@
 
 **Project**: Vāṇी Kosh Registry (`kosh-index`)
 **Operator / Maintainer**: Pratik M. Tambe &lt;enthusiasticgeek@gmail.com&gt;
-**Agreement version**: 1.1 — 2026-07-10
+**Agreement version**: 1.2 — 2026-07-10
 
 > This CLA governs **code contributions to the kosh-index repository itself**
 > (e.g. changes to `governance.json`, `config.json`, tooling scripts, or
@@ -83,8 +83,9 @@ obtained written employer permission?** (yes / N/A):
 [answer or "N/A — contribution is entirely independent of my employment"]
 
 ### CLA Declaration
-I have read the Vāṇī Kosh Registry Contributor License Agreement (CLA.md v1.1)
-and agree to its terms, including the Employment Independence and
+I have read the Vāṇī Kosh Registry Contributor License Agreement (CLA.md v1.2)
+and agree to its terms, including the Patent Non-Assertion Covenant (§4a),
+Patent Aggression Termination (§4b), and Employment Independence and
 Indemnification provisions (§6).
 
 I declare that the employment information above is accurate and complete.
@@ -116,7 +117,19 @@ Subject to the terms of this Agreement (and in particular subject to the represe
 
 ## 4. Patent License Grant
 
-You hereby grant to the Operator a **perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable** patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Registry and any derivative works, limited to patent claims necessarily infringed by Your Contribution(s) alone or in combination with the Registry.
+Subject to §§4a–4b, You hereby grant to the Operator a **perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable** patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Registry and any derivative works, limited to patent claims necessarily infringed by Your Contribution(s) alone or in combination with the Registry. This license extends to patent claims held by Your employer to the extent necessarily infringed by Your Contribution.
+
+---
+
+## 4a. Patent Non-Assertion Covenant
+
+You covenant, on behalf of yourself, your employer, successors, and assigns, **not to assert any patent claim** against the Registry, the Operator, or any user of the Registry's software, where such claim covers an invention first disclosed in this repository, substantially derived from Your Contribution, or implemented in the Registry at the time of Your Contribution. You further covenant not to file or fund any patent application on any such invention. This covenant runs with Your Contribution and binds Your successors and assigns.
+
+---
+
+## 4b. Patent Aggression Termination
+
+If You, Your employer, or any entity acting on Your behalf institutes a patent infringement proceeding against the Registry, the Operator, or any downstream recipient, all licenses granted to You under §§3–4 and Your contributor approval under §2 **terminate automatically** on the date such proceeding is filed. Termination does not relieve You of indemnification obligations under §6.2.
 
 ---
 
@@ -184,9 +197,69 @@ Contributions are provided "AS IS", without warranty of any kind.
 
 ---
 
-## 10. Governing Law
+## 10. Governing Law and Jurisdiction
 
-This Agreement is governed by applicable law. Disputes shall first be addressed through good-faith written negotiation. If unresolved after 30 days, the parties agree to binding arbitration.
+**Intellectual property matters** (patents, copyright, trade secrets) arising
+from this Agreement are governed by **United States federal law**, including
+the Patent Act (35 U.S.C.), the Copyright Act (17 U.S.C.), and the Defend
+Trade Secrets Act (18 U.S.C. § 1836). Federal courts of the United States
+have exclusive jurisdiction over such matters.
+
+**Contract and other disputes** are governed by the laws of the state in
+which the Operator is domiciled at the time the dispute is initiated. If
+the Operator is not domiciled in the United States at that time, the parties
+agree that the **State of California** governs, and the state and federal
+courts located in the Northern District of California shall have exclusive
+jurisdiction.
+
+**Dispute resolution sequence**:
+1. **Written negotiation** — 30 days to resolve in good faith.
+2. **Mediation** — 30 additional days before a mutually agreed neutral mediator.
+3. **Binding arbitration** — JAMS rules (or small claims court if claim is under USD $10,000).
+4. **Litigation** — last resort; prevailing party entitled to reasonable attorneys' fees.
+
+**Patent matters** may be brought directly to federal court without exhausting steps 1–3.
+
+> **Note on the Operator's immigration status**: The Operator resides in the
+> United States under valid work authorization. US jurisdiction is appropriate
+> because the Project was created and is maintained in the US, and the Operator
+> is physically domiciled in the US. The temporary nature of a US immigration
+> status does not affect legal domicile for contract purposes under US law.
+
+---
+
+## 11. Export Compliance
+
+You represent that Your Contribution does not originate from, and will not be
+submitted by any person in, a country subject to US export controls or
+sanctions (including but not limited to OFAC-sanctioned jurisdictions). You
+are not listed on any US government denied-party list (Entity List, SDN List,
+etc.).
+
+---
+
+## 12. Miscellaneous
+
+**Severability**: If any provision of this Agreement is held unenforceable, it
+shall be modified to the minimum extent necessary to make it enforceable; all
+other provisions remain in full force.
+
+**Entire Agreement**: This Agreement, together with [`PATENTS.md`](PATENTS.md)
+and [`CONTRIBUTORS_APPROVED.md`](CONTRIBUTORS_APPROVED.md), constitutes the entire
+agreement between You and the Operator regarding Your Contributions and
+supersedes all prior discussions.
+
+**No Waiver**: The Operator's failure to enforce any provision does not
+constitute a waiver of the right to enforce it in the future.
+
+**Modification**: The Operator may publish revised versions of this CLA. Each
+version is identified by a version number. Contributions made after a new
+version is published are governed by the new version. Contributions already
+accepted under a prior version remain governed by that version.
+
+**Assignment**: The Operator may assign this Agreement in connection with a
+transfer or sale of substantially all assets of the Registry. You may not
+assign your rights under this Agreement without written consent.
 
 ---
 
@@ -196,4 +269,4 @@ Open a GitHub Issue in the `kosh-index` repository or contact the Operator at &l
 
 ---
 
-*Revision: 2026-07-10 v1.1.*
+*Revision: 2026-07-10 v1.2.*
