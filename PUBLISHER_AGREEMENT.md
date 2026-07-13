@@ -141,8 +141,11 @@ version that violates this Agreement or applicable law, without prior notice.
 
 **6.3 Blacklisting.** The Operator may permanently ban a GitHub username from
 the Registry by adding an entry to `governance.json → blacklisted`. Blacklisted
-users are blocked at the `vanic publish` command level. A banned user may
-appeal by opening a GitHub issue labelled `blacklist-appeal` in `kosh-index`.
+users are blocked at the `vanic publish` command level. The full violation
+taxonomy, escalation process, cure timelines, and appeal path are defined in
+[ENFORCEMENT.md](ENFORCEMENT.md). A banned user may appeal by opening a GitHub
+issue labelled `blacklist-appeal` in `kosh-index` within 14 days of the ban
+date (see ENFORCEMENT.md §3).
 
 **6.4 Governance transfer.** The Operator may transfer registry governance to a
 committee or successor entity. The `governance.json` file controls who may

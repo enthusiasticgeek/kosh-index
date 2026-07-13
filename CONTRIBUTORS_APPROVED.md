@@ -28,10 +28,15 @@ The Operator (`@enthusiasticgeek`) does not require an entry here.
 
 ## Revoked
 
-| GitHub username | Revoked date | Reason |
-|----------------|-------------|--------|
-| *(none)* | — | — |
+Revocations follow the process defined in [ENFORCEMENT.md](ENFORCEMENT.md).
+The `category` column references the violation code from ENFORCEMENT.md §1
+(e.g. T1-A, T2-C). Blacklisted entries also appear in
+`governance.json → blacklisted` with the same category and an appeal deadline.
+
+| GitHub username | Revoked date | Category | Reason |
+|----------------|-------------|----------|--------|
+| *(none)* | — | — | — |
 
 ---
 
-*Updated by the Operator. Last revision: 2026-07-10.*
+*Updated by the Operator. Last revision: 2026-07-13.*

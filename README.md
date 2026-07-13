@@ -60,3 +60,8 @@ Each line in `index/<name>.json`:
 v1: `enthusiasticgeek` is the sole publish authority.  
 Packages are first-come first-served by name.  
 SMT-verified packages carry `"verified": true` in the index entry.
+
+Publisher access may be revoked or a publisher permanently blacklisted for
+violations of the [Publisher Agreement](PUBLISHER_AGREEMENT.md). Violation
+categories, escalation steps, cure timelines, and the appeal path are defined
+in [ENFORCEMENT.md](ENFORCEMENT.md).

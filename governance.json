@@ -3,6 +3,7 @@
   "agreement_version": "1.0",
   "agreement_url": "https://enthusiasticgeek.github.io/kosh-index/PUBLISHER_AGREEMENT.md",
   "governance_url": "https://github.com/enthusiasticgeek/kosh-index",
+  "enforcement_policy_url": "https://github.com/enthusiasticgeek/kosh-index/blob/main/ENFORCEMENT.md",
   "allowed_publishers": ["enthusiasticgeek"],
   "pending_publishers": [],
   "blacklisted": []
