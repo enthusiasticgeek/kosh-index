@@ -1,6 +1,6 @@
 # kosh-index
 
-![kosh-index logo](kosh-index_logo.png)
+<img src="kosh-index_logo.png" width="50%">
 
 Sparse package registry index for the [vāṇī compiler](https://github.com/enthusiasticgeek/vani-compiler).
 
