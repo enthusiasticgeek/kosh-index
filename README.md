@@ -1,5 +1,7 @@
 # kosh-index
 
+![kosh-index logo](kosh-index_logo.png)
+
 Sparse package registry index for the [vāṇī compiler](https://github.com/enthusiasticgeek/vani-compiler).
 
 **Registry URL:** `https://enthusiasticgeek.github.io/kosh-index`
