@@ -1,0 +1,55 @@
+name: Deploy Kosh Portal to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mdBook
+        run: |
+          curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.40/mdbook-v0.4.40-x86_64-unknown-linux-gnu.tar.gz \
+            | tar -xz --directory /usr/local/bin
+
+      - name: Build portal
+        run: mdbook build portal
+
+      # Merge registry protocol files into the built site so both
+      # the human-readable portal and the machine-readable index
+      # are served from the same Pages root.
+      - name: Copy registry files into site
+        run: |
+          cp config.json          portal/book/
+          cp .nojekyll            portal/book/
+          cp kosh-index_logo.png  portal/book/
+          cp -r index             portal/book/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: portal/book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
