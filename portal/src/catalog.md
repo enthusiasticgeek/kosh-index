@@ -54,7 +54,7 @@ calculus = { registry = "kosh", version = "^0.2" }
 
 ## probability
 
-**Version:** 0.4.1 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (bundled)
+**Version:** 0.4.2 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
 
 Probability and statistics library for the vāṇी compiler.
 
@@ -72,10 +72,11 @@ geometric Brownian motion, Kalman filtering).
 - **Checksum (0.1.0):** `0538b26e…26c1d1`
 - **Checksum (0.4.0):** `762ad554…11f364`
 - **Checksum (0.4.1):** `ef4eeed2…a7a5a34`
+- **Checksum (0.4.2):** `0d1a729a…655680`
 
 ```toml
 [deps]
-probability = { registry = "kosh", version = "^0.4.1" }
+probability = { registry = "kosh", version = "^0.4.2" }
 ```
 
 ---
