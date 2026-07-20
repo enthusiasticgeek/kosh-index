@@ -107,6 +107,29 @@ complex = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## optimize
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+
+Numerical optimization library for the vāṇी compiler.
+
+Includes unconstrained gradient-based methods (fixed-step and
+Armijo-backtracking gradient descent, Newton's method with analytic or
+finite-difference derivatives, coordinate descent), numerical differentiation
+(gradient and Hessian via finite differences), closed-form and iterative
+quadratic-objective solvers, a penalty-method constrained optimizer, and a
+tableau simplex linear-programming solver.
+
+- **Repository:** [enthusiasticgeek/vani-optimize](https://github.com/enthusiasticgeek/vani-optimize)
+- **Checksum (0.1.0):** `56db6d36…44b48`
+
+```toml
+[deps]
+optimize = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none

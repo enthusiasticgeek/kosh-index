@@ -21,6 +21,7 @@ Last updated: 2026-07-20
 | [calculus](https://github.com/enthusiasticgeek/vani-calculus) | 0.2.0 | Integration, differentiation, root-finding, 1D optimization, ODE solvers, polynomials, interpolation, series |
 | [probability](https://github.com/enthusiasticgeek/vani-probability) | 0.4.2 | Descriptive/inferential stats, distributions, Bayesian inference, Markov chains, time series, CDFs/p-values, MLR, PCA, stochastic processes |
 | [complex](https://github.com/enthusiasticgeek/vani-complex) | 0.1.0 | Complex numbers: arithmetic, polar form, exp/log/power/sqrt, trig/hyperbolic, roots of unity |
+| [optimize](https://github.com/enthusiasticgeek/vani-optimize) | 0.1.0 | Numerical optimization: gradient descent (fixed/backtracking), Newton's method (analytic/finite-difference), coordinate descent, quadratic solvers, penalty-method constrained optimization, tableau simplex LP |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -65,7 +66,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Probability | ✅ done | vani-probability |
 | Statistics | ✅ done | vani-probability |
 | Optimization — 1D | ✅ done | vani-calculus |
-| Optimization — multivariable/constrained/convex/LP | ❌ not done | new **vani-optimize** |
+| Optimization — multivariable/constrained/convex/LP | ✅ done (v0.1.0) | vani-optimize |
 | Geometry (computational + analytic) | ❌ not present | new **vani-geometry** |
 | Fourier/signal processing (FFT/DFT/Laplace/Z) | ❌ not present | new **vani-signal** |
 | Tensor math (N-D beyond matrices) | ❌ not present | new **vani-tensor** (depends on vani-matrix) |
@@ -90,7 +91,7 @@ Ordered by recommended build sequence (earlier entries unblock later ones).
 |---|---|---|---|---|
 | 1 | ~~**matrix v0.2**~~ ✅ shipped 2026-07-20 | -- | Eigenvalues (power iteration + deflation), QR (Householder), SVD (bidiagonalization), condition number. | 5 functions |
 | 2 | ~~**vani-complex**~~ ✅ shipped 2026-07-20 | -- | `Complex { re: f64, im: f64 }` struct + arithmetic, polar form, complex exp/log/trig, roots of unity. | 24 functions |
-| 3 | **vani-optimize** (new) | -- | Multivariable unconstrained (gradient descent, BFGS/L-BFGS-ish, Newton's method in N-D), constrained (Lagrange multipliers, penalty methods), linear programming (simplex), basic convex optimization. | ~25-35 functions |
+| 3 | ~~**vani-optimize**~~ ✅ shipped 2026-07-20 | -- | Multivariable unconstrained (fixed-step and Armijo-backtracking gradient descent, Newton's method with analytic or finite-difference derivatives, coordinate descent), quadratic specialty solvers, constrained (penalty method), linear programming (tableau simplex). | 20 functions |
 | 4 | **vani-geometry** (new) | -- | Computational: convex hull, line/segment intersection, point-in-polygon, closest-pair. Analytic: conic sections, distance/angle formulas in 2D/3D. | ~25-35 functions |
 | 5 | **vani-signal** (new) | vani-complex | FFT/DFT (Cooley-Tukey radix-2 to start), convolution, Laplace transform (numeric), Z-transform (numeric), windowing functions. | ~20-30 functions |
 | 6 | **vani-tensor** (new) | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | ~20-30 functions |
@@ -144,7 +145,7 @@ repos too.
 
 1. ~~**matrix v0.2** (eigen/QR/SVD)~~ ✅ shipped 2026-07-20 -- unblocks #6 and #8.
 2. ~~**vani-complex**~~ ✅ shipped 2026-07-20 -- unblocks #5.
-3. **vani-optimize** and **vani-geometry** -- independent of each other and of everything above; can be done in either order or in parallel. **Next up.**
+3. ~~**vani-optimize**~~ ✅ shipped 2026-07-20 and **vani-geometry** -- independent of each other and of everything above; either could be done in any order. **vani-geometry is next up.**
 4. **vani-signal** (needs #2) and **vani-tensor** (needs #1).
 5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
 6. **vani-algebra** -- lowest priority; niche once the above exist.
