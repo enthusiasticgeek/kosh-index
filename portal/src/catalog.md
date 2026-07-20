@@ -130,6 +130,30 @@ optimize = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## geometry
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+
+Computational and analytic geometry library for the vāṇी compiler.
+`Point2D`/`Point3D`/`Plane` are plain `f64`-field structs (freely copyable,
+same convention as `complex`'s `Complex`).
+
+Includes 2D/3D point and vector arithmetic, line/segment distance and
+intersection, triangle/polygon area/perimeter/centroid, point-in-polygon,
+convex hull (Andrew's monotone chain), brute-force closest pair, circumcircle
+construction, conic-section classification (ellipse/parabola/hyperbola), 3D
+planes and skew-line distance, and the law-of-cosines triangle angle.
+
+- **Repository:** [enthusiasticgeek/vani-geometry](https://github.com/enthusiasticgeek/vani-geometry)
+- **Checksum (0.1.0):** `372340c0…9818e86`
+
+```toml
+[deps]
+geometry = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
