@@ -6,7 +6,7 @@ All packages currently published to the Kosh registry.
 
 ## matrix
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
 
 Dense linear algebra library for the vāṇी compiler. Matrices are flat
 row-major `Vec<f64>` with explicit dimension arguments (no hidden metadata).
@@ -15,14 +15,17 @@ Includes construction (`mat_zeros`/`mat_identity`/`mat_from_diag`),
 element-wise arithmetic, transpose, vector ops (`dot_n`, `vec_norm2`,
 `vec_outer`), matrix multiply (square and rectangular), closed-form 2×2/3×3
 determinant and inverse, general n×n Gauss-Jordan inversion, LU decomposition
-with partial pivoting, and Cholesky decomposition.
+with partial pivoting, Cholesky decomposition, dominant eigenvalue/eigenvector
+via power iteration with deflation, condition number, Householder QR, and
+Golub-Kahan SVD bidiagonalization.
 
 - **Repository:** [enthusiasticgeek/vani-matrix](https://github.com/enthusiasticgeek/vani-matrix)
 - **Checksum (0.1.0):** `0ab90c55…403448`
+- **Checksum (0.2.0):** `9133b183…1877345`
 
 ```toml
 [deps]
-matrix = { registry = "kosh", version = "^0.1" }
+matrix = { registry = "kosh", version = "^0.2" }
 ```
 
 ---

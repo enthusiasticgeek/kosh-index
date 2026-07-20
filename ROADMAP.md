@@ -17,7 +17,7 @@ Last updated: 2026-07-20
 
 | Package | Version | Domain |
 |---|---|---|
-| [matrix](https://github.com/enthusiasticgeek/vani-matrix) | 0.1.0 | Dense linear algebra: construction, arithmetic, multiply, closed-form 2×2/3×3, Gauss-Jordan inverse, LU, Cholesky |
+| [matrix](https://github.com/enthusiasticgeek/vani-matrix) | 0.2.0 | Dense linear algebra: construction, arithmetic, multiply, closed-form 2×2/3×3, Gauss-Jordan inverse, LU, Cholesky, eigenvalues (power iteration + deflation), condition number, Householder QR, SVD bidiagonalization |
 | [calculus](https://github.com/enthusiasticgeek/vani-calculus) | 0.2.0 | Integration, differentiation, root-finding, 1D optimization, ODE solvers, polynomials, interpolation, series |
 | [probability](https://github.com/enthusiasticgeek/vani-probability) | 0.4.2 | Descriptive/inferential stats, distributions, Bayesian inference, Markov chains, time series, CDFs/p-values, MLR, PCA, stochastic processes |
 
@@ -53,7 +53,8 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Discrete math (graphs, basic combinatorics) | ✅ mostly done | builtin |
 | Algebra (equations, polynomial roots) | 🟡 partial (poly ops in vani-calculus) | extend vani-calculus, or new **vani-algebra** |
 | Linear algebra — dense | ✅ done | vani-matrix |
-| Linear algebra — eigenvalues/QR/SVD/sparse | ❌ not done | **extend vani-matrix** (already scoped as "Future v0.2.0" in its own TODO.md) |
+| Linear algebra — eigenvalues/QR/SVD (dense) | ✅ done (v0.2.0) | vani-matrix |
+| Linear algebra — sparse matrices | ❌ not done | new **vani-sparse**, or extend vani-matrix further |
 | Calculus — single-variable/1D | ✅ done | vani-calculus |
 | Calculus — vector (div/curl/multi-integral) | ❌ not done | extend vani-calculus, or new **vani-vectorcalc** |
 | Differential equations — ODE | ✅ done | vani-calculus |
@@ -86,7 +87,7 @@ Ordered by recommended build sequence (earlier entries unblock later ones).
 
 | # | Repo | Depends on | Scope | Rough size |
 |---|---|---|---|---|
-| 1 | **matrix v0.2** (extend, not new) | -- | Eigenvalues (power iteration + deflation), QR (Householder), SVD (bidiagonalization), condition number. Already scoped as "Future v0.2.0" in vani-matrix's own TODO.md. | ~8-10 functions |
+| 1 | ~~**matrix v0.2**~~ ✅ shipped 2026-07-20 | -- | Eigenvalues (power iteration + deflation), QR (Householder), SVD (bidiagonalization), condition number. | 5 functions |
 | 2 | **vani-complex** (new) | -- | `Complex { re: f64, im: f64 }` struct + arithmetic, polar form, complex exp/log/trig, roots of unity. Foundational -- vani-signal needs it. | ~20-25 functions |
 | 3 | **vani-optimize** (new) | -- | Multivariable unconstrained (gradient descent, BFGS/L-BFGS-ish, Newton's method in N-D), constrained (Lagrange multipliers, penalty methods), linear programming (simplex), basic convex optimization. | ~25-35 functions |
 | 4 | **vani-geometry** (new) | -- | Computational: convex hull, line/segment intersection, point-in-polygon, closest-pair. Analytic: conic sections, distance/angle formulas in 2D/3D. | ~25-35 functions |
@@ -140,8 +141,8 @@ repos too.
 
 ## Recommended order
 
-1. **matrix v0.2** (eigen/QR/SVD) -- smallest increment, already scoped, unblocks #6 and #8.
-2. **vani-complex** -- foundational, unblocks #5.
+1. ~~**matrix v0.2** (eigen/QR/SVD)~~ ✅ shipped 2026-07-20 -- unblocks #6 and #8.
+2. **vani-complex** -- foundational, unblocks #5. **Next up.**
 3. **vani-optimize** and **vani-geometry** -- independent of each other and of everything above; can be done in either order or in parallel.
 4. **vani-signal** (needs #2) and **vani-tensor** (needs #1).
 5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
@@ -163,3 +164,9 @@ repos too.
   correctly includes `vendor/` in the tarball as of vani-compiler commit `5732ba4`.
 - `authors` in `vani.toml` must be a plain quoted string (`authors = "name"`), not a
   TOML array -- the manifest parser used by `vanic publish` doesn't support arrays.
+- Validate functions **together**, not just in isolation. matrix v0.2's
+  `mat_eig_power` passed every isolated unit test (positive/negative/symmetric
+  eigenvalues) but had a real bug -- a uniform starting vector can land exactly on a
+  *non-dominant* eigenvector of a symmetric matrix by construction -- that only
+  surfaced once `mat_eig_deflate`'s output was fed back into it in an example. Write
+  the example that chains functions together before calling a module done, not after.
