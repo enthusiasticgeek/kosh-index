@@ -11,9 +11,10 @@ under "Kosh math-library ecosystem" and cross-linked from here.
 
 Last updated: 2026-07-20
 
-**Status: the numeric/scientific tier (all 10 packages below) is complete.**
+**Status: the numeric/scientific tier (all 11 packages below) is complete.**
 What remains is the optional, much larger symbolic tier — see "Planned:
-symbolic tier" below.
+symbolic tier" below, plus one still-open gap (vector calculus, see the
+gap-analysis table) that nobody has asked for yet.
 
 ---
 
@@ -31,6 +32,7 @@ symbolic tier" below.
 | [tensor](https://github.com/enthusiasticgeek/vani-tensor) | 0.1.0 | N-dimensional arrays: flat Vec<f64> + explicit shape encoding, shape/stride/index utilities, construction, reshape, elementwise arithmetic/reductions, last-axis broadcasting, general N-D axis permutation, contraction (via matrix's mat_mul_rect) |
 | [pde](https://github.com/enthusiasticgeek/vani-pde) | 0.1.0 | Finite-difference PDE solvers: 1D/2D Laplace-Poisson (elliptic, via matrix's mat_solve), 1D/2D heat (parabolic, explicit FTCS), 1D/2D wave (hyperbolic, explicit central-difference), Dirichlet BCs only |
 | [algebra](https://github.com/enthusiasticgeek/vani-algebra) | 0.1.0 | Polynomial root-finding (closed-form cubic; degree >= 4 via companion matrix + mat_eig_power + synthetic deflation + Newton polish, real roots only) and nonlinear equation systems (Newton-Raphson, analytic/finite-difference Jacobian, via mat_solve) |
+| [sparse](https://github.com/enthusiasticgeek/vani-sparse) | 0.1.0 | Sparse matrices: COO (build) / CSR (operate) formats, dense conversions, matvec, transpose, scale, add, matmul (Gustavson's algorithm); every op cross-checked against the equivalent dense vani-matrix operation |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -65,7 +67,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Algebra (equations, polynomial roots) | ✅ done (v0.1.0, real roots only) | vani-algebra |
 | Linear algebra — dense | ✅ done | vani-matrix |
 | Linear algebra — eigenvalues/QR/SVD (dense) | ✅ done (v0.2.0) | vani-matrix |
-| Linear algebra — sparse matrices | ❌ not done | new **vani-sparse**, or extend vani-matrix further |
+| Linear algebra — sparse matrices | ✅ done (v0.1.0) | vani-sparse |
 | Calculus — single-variable/1D | ✅ done | vani-calculus |
 | Calculus — vector (div/curl/multi-integral) | ❌ not done | extend vani-calculus, or new **vani-vectorcalc** |
 | Differential equations — ODE | ✅ done | vani-calculus |
@@ -94,8 +96,10 @@ planned here — flag if a real use case shows up.
 
 ## Numeric/scientific tier — complete ✅
 
-All 8 items below have shipped; kept as a build-sequence record (earlier
-entries unblocked later ones) and for the size/dependency data.
+All 9 items below have shipped; kept as a build-sequence record (earlier
+entries unblocked later ones) and for the size/dependency data. Items 1-8
+were the original ordered sequence; #9 (vani-sparse) filled a
+gap-analysis row that was never part of that sequence.
 
 | # | Repo | Depends on | Scope | Rough size |
 |---|---|---|---|---|
@@ -107,6 +111,7 @@ entries unblocked later ones) and for the size/dependency data.
 | 6 | ~~**vani-tensor**~~ ✅ shipped 2026-07-20 | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | 23 functions |
 | 7 | ~~**vani-pde**~~ ✅ shipped 2026-07-20 | matrix | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid, Dirichlet BCs, explicit time marching for heat/wave, direct dense solve via mat_solve for Laplace/Poisson. Shipped without a vani-calculus dependency -- no natural reuse point was found (see vani-pde's README "Design decisions"). | 21 functions |
 | 8 | ~~**vani-algebra**~~ ✅ shipped 2026-07-20 | matrix, calculus (reuses poly_* ops) | Polynomial root-finding: closed-form cubic, general real-root finder for degree >= 4 (companion matrix + mat_eig_power + synthetic deflation, not a hand-derived quartic closed form -- see package README), nonlinear equation systems via Newton-Raphson. Real roots only. | 11 functions |
+| 9 | ~~**vani-sparse**~~ ✅ shipped 2026-07-20 | matrix (test/interop only) | Sparse matrix formats (COO to build, CSR to operate on) and core ops -- matvec, transpose, scale, add, matmul (Gustavson's algorithm). Filled the "Linear algebra — sparse matrices" gap-analysis row; added after the original 8-item sequence was already complete. | 17 functions |
 
 ## Planned: symbolic tier (optional, separate scope)
 
@@ -144,6 +149,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **New numeric repos** | ✅ vani-complex, vani-optimize, vani-geometry, vani-signal | ~20-40 functions each, same validate-against-known-values discipline as the existing repos | ~1 unit each |
 | **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
 | **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
+| **Gap-fill repo, requested separately** | ✅ vani-sparse | ~17 functions, validated via cross-checking every sparse op against the equivalent dense vani-matrix op rather than hand-computed values (the strongest check available for this kind of code) | ~1 unit |
 | **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra (not started; optional) | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
@@ -160,8 +166,9 @@ repos too.
 3. ~~**vani-optimize**~~ ✅ shipped 2026-07-20 and ~~**vani-geometry**~~ ✅ shipped 2026-07-20 -- both independent of each other and of everything above.
 4. ~~**vani-signal**~~ ✅ shipped 2026-07-20 (needed #2) and ~~**vani-tensor**~~ ✅ shipped 2026-07-20 (needed #1).
 5. ~~**vani-pde**~~ ✅ shipped 2026-07-20 -- used matrix's mat_solve for the elliptic solvers; calculus's ODE machinery didn't end up fitting (see vani-pde README).
-6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- the numeric-tier roadmap is now complete end to end.
-7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.**
+6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- completed the original 8-item ordered sequence.
+7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" gap-analysis row, requested separately from the ordered sequence above.
+8. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.**
 
 ---
 

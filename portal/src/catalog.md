@@ -256,6 +256,31 @@ algebra = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## sparse
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
+
+Sparse matrix format and operations library for the vāṇी compiler. Two
+struct types: `SparseCOO` (easy to build incrementally) and `SparseCSR`
+(the efficient format every operation works on); a CSR matrix's dense form
+is byte-for-byte vani-matrix's row-major layout.
+
+Includes COO/CSR/dense conversions (with duplicate-entry summing),
+`sparse_csr_matvec` (O(nnz) matrix-vector product), transpose, scale, add,
+and `sparse_csr_matmul` (sparse-sparse multiply via Gustavson's algorithm).
+Every operation is cross-checked against the equivalent dense vani-matrix
+operation on the same data.
+
+- **Repository:** [enthusiasticgeek/vani-sparse](https://github.com/enthusiasticgeek/vani-sparse)
+- **Checksum (0.1.0):** `2b0cd8e9…2e5b26e3b`
+
+```toml
+[deps]
+sparse = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
