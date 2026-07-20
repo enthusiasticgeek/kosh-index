@@ -25,6 +25,7 @@ Last updated: 2026-07-20
 | [geometry](https://github.com/enthusiasticgeek/vani-geometry) | 0.1.0 | Computational + analytic geometry: 2D/3D point/vector arithmetic, line/segment distance and intersection, polygon area/perimeter/centroid, point-in-polygon, convex hull, closest pair, circumcircle, conic classification, 3D planes and skew-line distance |
 | [signal](https://github.com/enthusiasticgeek/vani-signal) | 0.1.0 | Signal processing: naive DFT/IDFT, Cooley-Tukey radix-2 FFT/IFFT, magnitude/power spectrum and frequency-bin helpers, zero-padding, linear/circular convolution, cross-correlation, Hann/Hamming/Blackman windowing, numeric Laplace/Z transforms |
 | [tensor](https://github.com/enthusiasticgeek/vani-tensor) | 0.1.0 | N-dimensional arrays: flat Vec<f64> + explicit shape encoding, shape/stride/index utilities, construction, reshape, elementwise arithmetic/reductions, last-axis broadcasting, general N-D axis permutation, contraction (via matrix's mat_mul_rect) |
+| [pde](https://github.com/enthusiasticgeek/vani-pde) | 0.1.0 | Finite-difference PDE solvers: 1D/2D Laplace-Poisson (elliptic, via matrix's mat_solve), 1D/2D heat (parabolic, explicit FTCS), 1D/2D wave (hyperbolic, explicit central-difference), Dirichlet BCs only |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -63,7 +64,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Calculus — single-variable/1D | ✅ done | vani-calculus |
 | Calculus — vector (div/curl/multi-integral) | ❌ not done | extend vani-calculus, or new **vani-vectorcalc** |
 | Differential equations — ODE | ✅ done | vani-calculus |
-| Differential equations — PDE | ❌ not done | new **vani-pde** (big — finite difference/element methods) |
+| Differential equations — PDE | ✅ done (v0.1.0) | vani-pde |
 | Complex analysis | ✅ done (v0.1.0) | vani-complex |
 | Numerical analysis | ✅ mostly done | vani-calculus |
 | Probability | ✅ done | vani-probability |
@@ -98,7 +99,7 @@ Ordered by recommended build sequence (earlier entries unblock later ones).
 | 4 | ~~**vani-geometry**~~ ✅ shipped 2026-07-20 | -- | Computational: convex hull (Andrew's monotone chain), closest pair, point-in-polygon, segment intersection. Analytic: circumcircle, conic-section classification, 2D/3D distance/angle formulas, 3D planes and skew-line distance. | 38 functions |
 | 5 | ~~**vani-signal**~~ ✅ shipped 2026-07-20 | vani-complex | FFT/DFT (Cooley-Tukey radix-2), convolution/correlation, numeric Laplace/Z transforms, windowing functions. | 21 functions |
 | 6 | ~~**vani-tensor**~~ ✅ shipped 2026-07-20 | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | 23 functions |
-| 7 | **vani-pde** (new) | matrix, calculus | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid. Biggest design surface of this tier -- needs an explicit discretization-scheme decision up front. | ~15-25 functions, more design overhead per function |
+| 7 | ~~**vani-pde**~~ ✅ shipped 2026-07-20 | matrix | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid, Dirichlet BCs, explicit time marching for heat/wave, direct dense solve via mat_solve for Laplace/Poisson. Shipped without a vani-calculus dependency -- no natural reuse point was found (see vani-pde's README "Design decisions"). | 21 functions |
 | 8 | **vani-algebra** (new, lower priority) | calculus (reuses poly_* ops) | Polynomial root-finding beyond quadratic (cubic/quartic closed forms, numeric for higher degree via companion-matrix eigenvalues -- needs #1), linear/nonlinear equation systems. | ~15-20 functions |
 
 ## Planned: symbolic tier (optional, separate scope)
@@ -150,8 +151,8 @@ repos too.
 2. ~~**vani-complex**~~ ✅ shipped 2026-07-20 -- unblocks #5.
 3. ~~**vani-optimize**~~ ✅ shipped 2026-07-20 and ~~**vani-geometry**~~ ✅ shipped 2026-07-20 -- both independent of each other and of everything above.
 4. ~~**vani-signal**~~ ✅ shipped 2026-07-20 (needed #2) and ~~**vani-tensor**~~ ✅ shipped 2026-07-20 (needed #1).
-5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing. **Next up.**
-6. **vani-algebra** -- lowest priority; niche once the above exist.
+5. ~~**vani-pde**~~ ✅ shipped 2026-07-20 -- used matrix's mat_solve for the elliptic solvers; calculus's ODE machinery didn't end up fitting (see vani-pde README).
+6. **vani-algebra** -- lowest priority; niche once the above exist. **Next up.**
 7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it.
 
 ---

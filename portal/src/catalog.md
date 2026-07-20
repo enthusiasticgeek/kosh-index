@@ -202,6 +202,33 @@ tensor = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## pde
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+
+Finite-difference PDE solver library for the vāṇी compiler. Grids are flat
+row-major `Vec<f64>` (1D: length `n`; 2D: length `nx*ny`, same layout as a
+`matrix` matrix), Dirichlet boundary conditions only.
+
+Includes 1D/2D Laplace-Poisson (elliptic, solved directly by assembling the
+stencil into a dense matrix and calling `matrix`'s `mat_solve`), 1D/2D heat
+(parabolic, explicit FTCS time marching with a stability-number helper), and
+1D/2D wave (hyperbolic, explicit central-difference time marching with a
+Courant-number helper and a Taylor-series first step). Every solver is
+validated against a closed-form solution (harmonic polynomials for Laplace,
+decaying/standing sine solutions for heat/wave), not just plausible-looking
+output.
+
+- **Repository:** [enthusiasticgeek/vani-pde](https://github.com/enthusiasticgeek/vani-pde)
+- **Checksum (0.1.0):** `a1de34fd…7fdd3224`
+
+```toml
+[deps]
+pde = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
