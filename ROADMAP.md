@@ -12,9 +12,11 @@ under "Kosh math-library ecosystem" and cross-linked from here.
 Last updated: 2026-07-20
 
 **Status: the numeric/scientific tier (all 12 packages below) is complete,
-and every row in the gap-analysis table below is now ✅.** What remains is
+and every row in the gap-analysis table below is now ✅** (three rows carry
+a "mostly done" qualifier — see "Known gaps within 'mostly done' rows" for
+the itemized list of what's still missing under those). What remains is
 the optional, much larger symbolic tier — see "Planned: symbolic tier"
-below.
+below — plus the smaller, unscheduled items in that gaps section.
 
 ---
 
@@ -64,7 +66,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 |---|---|---|
 | Elementary mathematics | ✅ done | builtin |
 | Number theory | ✅ done | builtin |
-| Discrete math (graphs, basic combinatorics) | ✅ mostly done | builtin |
+| Discrete math (graphs, basic combinatorics) | ✅ mostly done¹ | builtin |
 | Algebra (equations, polynomial roots) | ✅ done (v0.1.0, real roots only) | vani-algebra |
 | Linear algebra — dense | ✅ done | vani-matrix |
 | Linear algebra — eigenvalues/QR/SVD (dense) | ✅ done (v0.2.0) | vani-matrix |
@@ -74,7 +76,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Differential equations — ODE | ✅ done | vani-calculus |
 | Differential equations — PDE | ✅ done (v0.1.0) | vani-pde |
 | Complex analysis | ✅ done (v0.1.0) | vani-complex |
-| Numerical analysis | ✅ mostly done | vani-calculus |
+| Numerical analysis | ✅ mostly done² | vani-calculus |
 | Probability | ✅ done | vani-probability |
 | Statistics | ✅ done | vani-probability |
 | Optimization — 1D | ✅ done | vani-calculus |
@@ -82,7 +84,72 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Geometry (computational + analytic) | ✅ done (v0.1.0) | vani-geometry |
 | Fourier/signal processing (FFT/DFT/Laplace/Z) | ✅ done (v0.1.0) | vani-signal |
 | Tensor math (N-D beyond matrices) | ✅ done (v0.1.0) | vani-tensor |
-| Scientific computing (aggregate) | ✅ substantially covered | vani-matrix + vani-calculus + vani-probability |
+| Scientific computing (aggregate) | ✅ substantially covered³ | vani-matrix + vani-calculus + vani-probability |
+
+### ¹²³ Known gaps within "mostly done" / "substantially covered" rows
+
+Three rows above are marked done with a qualifier rather than a plain ✅ —
+this section spells out exactly what's still missing under each, as a
+tracked TODO list distinct from the (already-tracked, already-shipped)
+items elsewhere in this document.
+
+**¹ Discrete math (graphs, basic combinatorics)** — covered: BFS/DFS/
+Dijkstra/A*/cycle-detection/MST(Kruskal+Prim)/topo-sort (graphs),
+factorial/binomial/perm/fibonacci (combinatorics, **counting only**).
+Missing:
+
+| # | Gap | Notes |
+|---|---|---|
+| G1 | All-pairs shortest path (Floyd-Warshall) | |
+| G2 | Strongly-connected components (Tarjan or Kosaraju) | |
+| G3 | Max-flow / min-cut (Ford-Fulkerson or Dinic's) | |
+| G4 | Bipartite matching (Hopcroft-Karp or augmenting-path) | |
+| G5 | Graph coloring (greedy, or backtracking for exact) | |
+| G6 | Permutation/combination/subset **enumeration** (not just counting) | e.g. next-permutation, generate all k-subsets |
+| G7 | Integer partition functions | |
+
+**² Numerical analysis** — covered: integration (trapz/Simpson/Romberg/
+Gauss-Legendre 5-point/adaptive), differentiation (central/forward/second,
+1D gradient/Jacobian/Hessian-diag), root-finding (bisection/secant/Newton/
+Brent), 1D optimization (golden-section/Brent/Newton), ODE (Euler/RK4/
+RK45/Adams-Bashforth-2 — **all explicit**), polynomials, interpolation
+(Lagrange/linear-table/natural-cubic-spline), stable summation. Missing:
+
+| # | Gap | Notes |
+|---|---|---|
+| N1 | Implicit/stiff ODE solvers (backward Euler, Crank-Nicolson, BDF2) | needed for stiff systems where explicit solvers need impractically small steps |
+| N2 | ODE boundary-value-problem solver (shooting method) | vani-pde solves PDE BCs on a grid, not general ODE BVPs |
+| N3 | Interval arithmetic / rigorous error-propagation | open scope, unclear real demand yet |
+
+**³ Scientific computing (aggregate)** — this row is a rollup, not a
+concrete deliverable, and is now largely redundant with the specific rows
+above it (signal processing, sparse matrices, and PDEs all graduated into
+their own rows already). No new tracked items here; candidate for
+downgrading to a footnote or removing outright next time this file gets a
+structural pass, rather than a source of real gaps.
+
+#### Where would G1-G7 / N1-N3 actually live?
+
+Not yet decided — options, not commitments:
+
+- **G1-G5** (graph algorithms) fit naturally as a new **vani-graph**
+  package built on the same `graph_new`/`add_edge`-style representation
+  the builtins already use, OR as new compiler builtins alongside the
+  existing graph builtin set (a call vani-compiler's own maintainers would
+  make, tracked in `vani-compiler/docs/TODO_CURRENT.md`, not this repo).
+- **G6-G7** (combinatorics enumeration) could fold into the same
+  vani-graph package as a "discrete" package, or stay separate as a small
+  **vani-combinatorics**.
+- **N1-N2** (stiff/BVP ODE solvers) are a natural **vani-calculus v0.3**
+  extension — same package, same `poly_*`/ODE conventions, no new
+  dependency.
+- **N3** (interval arithmetic) has no obvious home yet and unclear
+  real-world pull; lowest priority of the group.
+
+None of G1-G7 or N1-N3 are scheduled — this is a gap inventory, not a
+commitment to build. Confirm scope and priority before starting any of
+them, same as the (now-complete) numeric tier and the still-optional
+symbolic tier.
 
 ### What's out of scope for this roadmap (research-tier math)
 
