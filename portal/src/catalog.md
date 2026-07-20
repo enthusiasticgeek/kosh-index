@@ -281,6 +281,31 @@ sparse = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## vectorcalc
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** calculus ^0.2 (real registry dependency)
+
+Vector calculus library for the vāṇी compiler: gradient, divergence, curl,
+Laplacian (2D and 3D, central finite differences), and double/triple/line
+integrals.
+
+Multi-dimensional integration reuses `calculus`'s `integrate_simpson` via
+pre-sampling instead of closures (vāṇी has no closures) -- see the
+package's own README for how. Validated against hand-computed closed
+forms plus two composed identities: `curl(grad f) = 0` for any scalar
+field, and the 2D divergence theorem on a square (double integral of
+divergence equals the sum of outward flux across all four edges).
+
+- **Repository:** [enthusiasticgeek/vani-vectorcalc](https://github.com/enthusiasticgeek/vani-vectorcalc)
+- **Checksum (0.1.0):** `280173fa…7024967d1ab1661`
+
+```toml
+[deps]
+vectorcalc = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
