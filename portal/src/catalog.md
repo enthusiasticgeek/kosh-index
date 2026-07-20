@@ -229,6 +229,33 @@ pde = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## algebra
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
+
+Polynomial root-finding and nonlinear equation system library for the vāṇी
+compiler. Polynomial coefficients are ascending `Vec<f64>`, matching
+`calculus`'s `poly_eval`/`poly_deriv_coeffs`/`poly_mul` convention.
+
+Includes a closed-form cubic real-root solver (Cardano's method), a general
+real-root finder for any degree (degree >= 4 via companion matrix +
+`matrix`'s `mat_eig_power` + synthetic polynomial deflation + Newton
+polishing -- deliberately not a hand-derived quartic closed form, see the
+package's own README), a `algebra_quartic_roots_real` convenience wrapper
+over that same path, and Newton-Raphson solvers for systems of nonlinear
+equations (analytic or finite-difference Jacobian, `matrix`'s `mat_solve`
+at every step). Real roots only -- no complex-root support in v0.1.0.
+
+- **Repository:** [enthusiasticgeek/vani-algebra](https://github.com/enthusiasticgeek/vani-algebra)
+- **Checksum (0.1.0):** `c4f8f759…d42b169fdb`
+
+```toml
+[deps]
+algebra = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
