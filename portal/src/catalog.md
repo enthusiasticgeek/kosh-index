@@ -154,6 +154,29 @@ geometry = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## signal
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
+
+Digital signal processing library for the vāṇी compiler. Time/sample-domain
+data is `Vec<f64>`; frequency-domain data is `Vec<Complex>` (from `complex`).
+
+Includes naive DFT/IDFT (any length), Cooley-Tukey radix-2 FFT/IFFT (power-of-2
+length, with a real-input convenience wrapper), magnitude/power spectrum and
+frequency-bin helpers, zero-padding utilities, linear/circular convolution,
+cross-correlation, Hann/Hamming/Blackman/rectangular windowing, and numeric
+(trapezoidal) Laplace and Z transforms.
+
+- **Repository:** [enthusiasticgeek/vani-signal](https://github.com/enthusiasticgeek/vani-signal)
+- **Checksum (0.1.0):** `225861fb…c7425817`
+
+```toml
+[deps]
+signal = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
