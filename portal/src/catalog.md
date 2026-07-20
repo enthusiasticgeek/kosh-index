@@ -177,6 +177,31 @@ signal = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## tensor
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+
+N-dimensional array library for the vāṇी compiler. A tensor is a flat
+row-major `Vec<f64>` plus an explicit `Vec<i64>` shape (no hidden metadata) --
+a rank-2 tensor's data is byte-for-byte the same layout as a `matrix` matrix.
+
+Includes shape/stride/index utilities (with flatten/unflatten round-tripping),
+construction (zeros/ones/full/copy), get/set indexing, reshape, elementwise
+arithmetic and reductions (add/sub/mul/scale/sum/mean/max/min), last-axis
+broadcasting, general N-D axis permutation, and tensor contraction
+(implemented as a thin wrapper over `matrix`'s `mat_mul_rect`, since a
+row-major tensor's data is already exactly the matrix that function expects).
+
+- **Repository:** [enthusiasticgeek/vani-tensor](https://github.com/enthusiasticgeek/vani-tensor)
+- **Checksum (0.1.0):** `e6c2475c…16f56a`
+
+```toml
+[deps]
+tensor = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none

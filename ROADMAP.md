@@ -24,6 +24,7 @@ Last updated: 2026-07-20
 | [optimize](https://github.com/enthusiasticgeek/vani-optimize) | 0.1.0 | Numerical optimization: gradient descent (fixed/backtracking), Newton's method (analytic/finite-difference), coordinate descent, quadratic solvers, penalty-method constrained optimization, tableau simplex LP |
 | [geometry](https://github.com/enthusiasticgeek/vani-geometry) | 0.1.0 | Computational + analytic geometry: 2D/3D point/vector arithmetic, line/segment distance and intersection, polygon area/perimeter/centroid, point-in-polygon, convex hull, closest pair, circumcircle, conic classification, 3D planes and skew-line distance |
 | [signal](https://github.com/enthusiasticgeek/vani-signal) | 0.1.0 | Signal processing: naive DFT/IDFT, Cooley-Tukey radix-2 FFT/IFFT, magnitude/power spectrum and frequency-bin helpers, zero-padding, linear/circular convolution, cross-correlation, Hann/Hamming/Blackman windowing, numeric Laplace/Z transforms |
+| [tensor](https://github.com/enthusiasticgeek/vani-tensor) | 0.1.0 | N-dimensional arrays: flat Vec<f64> + explicit shape encoding, shape/stride/index utilities, construction, reshape, elementwise arithmetic/reductions, last-axis broadcasting, general N-D axis permutation, contraction (via matrix's mat_mul_rect) |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -71,7 +72,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Optimization — multivariable/constrained/convex/LP | ✅ done (v0.1.0) | vani-optimize |
 | Geometry (computational + analytic) | ✅ done (v0.1.0) | vani-geometry |
 | Fourier/signal processing (FFT/DFT/Laplace/Z) | ✅ done (v0.1.0) | vani-signal |
-| Tensor math (N-D beyond matrices) | ❌ not present | new **vani-tensor** (depends on vani-matrix) |
+| Tensor math (N-D beyond matrices) | ✅ done (v0.1.0) | vani-tensor |
 | Scientific computing (aggregate) | ✅ substantially covered | vani-matrix + vani-calculus + vani-probability |
 
 ### What's out of scope for this roadmap (research-tier math)
@@ -96,7 +97,7 @@ Ordered by recommended build sequence (earlier entries unblock later ones).
 | 3 | ~~**vani-optimize**~~ ✅ shipped 2026-07-20 | -- | Multivariable unconstrained (fixed-step and Armijo-backtracking gradient descent, Newton's method with analytic or finite-difference derivatives, coordinate descent), quadratic specialty solvers, constrained (penalty method), linear programming (tableau simplex). | 20 functions |
 | 4 | ~~**vani-geometry**~~ ✅ shipped 2026-07-20 | -- | Computational: convex hull (Andrew's monotone chain), closest pair, point-in-polygon, segment intersection. Analytic: circumcircle, conic-section classification, 2D/3D distance/angle formulas, 3D planes and skew-line distance. | 38 functions |
 | 5 | ~~**vani-signal**~~ ✅ shipped 2026-07-20 | vani-complex | FFT/DFT (Cooley-Tukey radix-2), convolution/correlation, numeric Laplace/Z transforms, windowing functions. | 21 functions |
-| 6 | **vani-tensor** (new) | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | ~20-30 functions |
+| 6 | ~~**vani-tensor**~~ ✅ shipped 2026-07-20 | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | 23 functions |
 | 7 | **vani-pde** (new) | matrix, calculus | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid. Biggest design surface of this tier -- needs an explicit discretization-scheme decision up front. | ~15-25 functions, more design overhead per function |
 | 8 | **vani-algebra** (new, lower priority) | calculus (reuses poly_* ops) | Polynomial root-finding beyond quadratic (cubic/quartic closed forms, numeric for higher degree via companion-matrix eigenvalues -- needs #1), linear/nonlinear equation systems. | ~15-20 functions |
 
@@ -148,8 +149,8 @@ repos too.
 1. ~~**matrix v0.2** (eigen/QR/SVD)~~ ✅ shipped 2026-07-20 -- unblocks #6 and #8.
 2. ~~**vani-complex**~~ ✅ shipped 2026-07-20 -- unblocks #5.
 3. ~~**vani-optimize**~~ ✅ shipped 2026-07-20 and ~~**vani-geometry**~~ ✅ shipped 2026-07-20 -- both independent of each other and of everything above.
-4. ~~**vani-signal**~~ ✅ shipped 2026-07-20 (needed #2). **vani-tensor** (needs #1) is next up.
-5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
+4. ~~**vani-signal**~~ ✅ shipped 2026-07-20 (needed #2) and ~~**vani-tensor**~~ ✅ shipped 2026-07-20 (needed #1).
+5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing. **Next up.**
 6. **vani-algebra** -- lowest priority; niche once the above exist.
 7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it.
 
