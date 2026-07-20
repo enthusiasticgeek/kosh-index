@@ -40,6 +40,46 @@ naive coverage table don't need their own repos -- they're already in the langua
 
 ---
 
+## Gap analysis — field by field
+
+The full picture against a standard "what does a scientific-computing stack cover"
+breakdown (elementary → graduate-level applied math). Anything marked ✅ needs no new
+work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
+
+| Field | Status | Repo |
+|---|---|---|
+| Elementary mathematics | ✅ done | builtin |
+| Number theory | ✅ done | builtin |
+| Discrete math (graphs, basic combinatorics) | ✅ mostly done | builtin |
+| Algebra (equations, polynomial roots) | 🟡 partial (poly ops in vani-calculus) | extend vani-calculus, or new **vani-algebra** |
+| Linear algebra — dense | ✅ done | vani-matrix |
+| Linear algebra — eigenvalues/QR/SVD/sparse | ❌ not done | **extend vani-matrix** (already scoped as "Future v0.2.0" in its own TODO.md) |
+| Calculus — single-variable/1D | ✅ done | vani-calculus |
+| Calculus — vector (div/curl/multi-integral) | ❌ not done | extend vani-calculus, or new **vani-vectorcalc** |
+| Differential equations — ODE | ✅ done | vani-calculus |
+| Differential equations — PDE | ❌ not done | new **vani-pde** (big — finite difference/element methods) |
+| Complex analysis | ❌ not present at all | new **vani-complex** |
+| Numerical analysis | ✅ mostly done | vani-calculus |
+| Probability | ✅ done | vani-probability |
+| Statistics | ✅ done | vani-probability |
+| Optimization — 1D | ✅ done | vani-calculus |
+| Optimization — multivariable/constrained/convex/LP | ❌ not done | new **vani-optimize** |
+| Geometry (computational + analytic) | ❌ not present | new **vani-geometry** |
+| Fourier/signal processing (FFT/DFT/Laplace/Z) | ❌ not present | new **vani-signal** |
+| Tensor math (N-D beyond matrices) | ❌ not present | new **vani-tensor** (depends on vani-matrix) |
+| Scientific computing (aggregate) | ✅ substantially covered | vani-matrix + vani-calculus + vani-probability |
+
+### What's out of scope for this roadmap (research-tier math)
+
+Abstract algebra (groups/rings/fields), category theory, topology, differential
+geometry, algebraic geometry, functional analysis, measure theory, Lie groups/algebras,
+representation theory, algebraic topology, noncommutative geometry, tensor calculus for
+general relativity, exterior algebra/differential forms, Clifford/geometric algebra.
+These serve much narrower audiences than the core scientific stack below and aren't
+planned here — flag if a real use case shows up.
+
+---
+
 ## Planned: numeric/scientific tier
 
 Ordered by recommended build sequence (earlier entries unblock later ones).
@@ -70,17 +110,45 @@ the numeric tier above.
 | **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. |
 | **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. Could fold into vani-symbolic instead of being standalone. |
 
+If the goal is SciPy/Eigen/Boost.Math-class coverage, the numeric tier above is the
+whole job. If the goal is closer to Mathematica/Maple/SageMath, the symbolic tier is
+required on top -- and is a fundamentally larger undertaking than everything else in
+this document combined.
+
+---
+
+## Effort estimates
+
+Calibrated against what's actually happened building the three published packages --
+vani-probability alone went from ~42 functions to ~90+ across four version bumps, each
+with hand-verified reference values, tests, examples, and docs, plus two real compiler
+bugs found and fixed along the way, all within a bounded body of work.
+
+| Tier | Repos | Rough shape per repo | Relative effort |
+|---|---|---|---|
+| **Matrix extension** | eigenvalues/QR/SVD in vani-matrix | ~8-10 functions, numerically fussier than what's there (iterative eigensolvers are easy to get subtly wrong) | 0.5–1 unit |
+| **New numeric repos** | vani-complex, vani-optimize, vani-geometry, vani-signal | ~25-40 functions each, same validate-against-known-values discipline as the existing 3 repos | ~1 unit each |
+| **Bigger numeric repos** | vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
+| **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
+
+"Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
+each published package so far was validation, compiler-bug archaeology, and doc/registry
+mechanics rather than raw function-writing, and that ratio should hold for the planned
+repos too.
+
 ---
 
 ## Recommended order
 
-1. matrix v0.2 (eigen/QR/SVD) -- smallest increment, already scoped, unblocks #6 and #8.
-2. vani-complex -- foundational, unblocks #5.
-3. vani-optimize and vani-geometry -- independent of each other and of everything above; can be done in either order or in parallel.
-4. vani-signal (needs #2) and vani-tensor (needs #1).
-5. vani-pde -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
-6. vani-algebra -- lowest priority; niche once the above exist.
-7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with vani-bignum, since vani-symbolic can't do much without exact arithmetic underneath it.
+1. **matrix v0.2** (eigen/QR/SVD) -- smallest increment, already scoped, unblocks #6 and #8.
+2. **vani-complex** -- foundational, unblocks #5.
+3. **vani-optimize** and **vani-geometry** -- independent of each other and of everything above; can be done in either order or in parallel.
+4. **vani-signal** (needs #2) and **vani-tensor** (needs #1).
+5. **vani-pde** -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
+6. **vani-algebra** -- lowest priority; niche once the above exist.
+7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it.
+
+---
 
 ## Notes for whoever picks up a repo from this list
 
