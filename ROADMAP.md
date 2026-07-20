@@ -11,6 +11,10 @@ under "Kosh math-library ecosystem" and cross-linked from here.
 
 Last updated: 2026-07-20
 
+**Status: the numeric/scientific tier (all 10 packages below) is complete.**
+What remains is the optional, much larger symbolic tier — see "Planned:
+symbolic tier" below.
+
 ---
 
 ## Already published
@@ -88,9 +92,10 @@ planned here — flag if a real use case shows up.
 
 ---
 
-## Planned: numeric/scientific tier
+## Numeric/scientific tier — complete ✅
 
-Ordered by recommended build sequence (earlier entries unblock later ones).
+All 8 items below have shipped; kept as a build-sequence record (earlier
+entries unblocked later ones) and for the size/dependency data.
 
 | # | Repo | Depends on | Scope | Rough size |
 |---|---|---|---|---|
@@ -127,17 +132,19 @@ this document combined.
 
 ## Effort estimates
 
-Calibrated against what's actually happened building the three published packages --
+Calibrated against what's actually happened building the published packages --
 vani-probability alone went from ~42 functions to ~90+ across four version bumps, each
 with hand-verified reference values, tests, examples, and docs, plus two real compiler
-bugs found and fixed along the way, all within a bounded body of work.
+bugs found and fixed along the way, all within a bounded body of work. The numeric tier
+is now fully shipped, so this table doubles as a retrospective: the estimates held up.
 
 | Tier | Repos | Rough shape per repo | Relative effort |
 |---|---|---|---|
-| **Matrix extension** | eigenvalues/QR/SVD in vani-matrix | ~8-10 functions, numerically fussier than what's there (iterative eigensolvers are easy to get subtly wrong) | 0.5–1 unit |
-| **New numeric repos** | vani-complex, vani-optimize, vani-geometry, vani-signal | ~25-40 functions each, same validate-against-known-values discipline as the existing 3 repos | ~1 unit each |
-| **Bigger numeric repos** | vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
-| **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
+| **Matrix extension** | ✅ eigenvalues/QR/SVD in vani-matrix | ~8-10 functions, numerically fussier than what's there (iterative eigensolvers are easy to get subtly wrong) | 0.5–1 unit |
+| **New numeric repos** | ✅ vani-complex, vani-optimize, vani-geometry, vani-signal | ~20-40 functions each, same validate-against-known-values discipline as the existing repos | ~1 unit each |
+| **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
+| **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
+| **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra (not started; optional) | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
 each published package so far was validation, compiler-bug archaeology, and doc/registry
