@@ -1,0 +1,97 @@
+# Kosh Math Ecosystem Roadmap
+
+This tracks which **packages** should exist to give vāṇी broad mathematical library
+coverage — comparable to SciPy / Eigen / Armadillo / Boost.Math for the numeric tier,
+with an optional, much larger symbolic tier on top. `catalog.md` lists what's actually
+published right now; this file is the forward-looking plan.
+
+Compiler-level items that this roadmap depends on (if any) are tracked in
+[vani-compiler's docs/TODO_CURRENT.md](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/TODO_CURRENT.md)
+under "Kosh math-library ecosystem" and cross-linked from here.
+
+Last updated: 2026-07-20
+
+---
+
+## Already published
+
+| Package | Version | Domain |
+|---|---|---|
+| [matrix](https://github.com/enthusiasticgeek/vani-matrix) | 0.1.0 | Dense linear algebra: construction, arithmetic, multiply, closed-form 2×2/3×3, Gauss-Jordan inverse, LU, Cholesky |
+| [calculus](https://github.com/enthusiasticgeek/vani-calculus) | 0.2.0 | Integration, differentiation, root-finding, 1D optimization, ODE solvers, polynomials, interpolation, series |
+| [probability](https://github.com/enthusiasticgeek/vani-probability) | 0.4.2 | Descriptive/inferential stats, distributions, Bayesian inference, Markov chains, time series, CDFs/p-values, MLR, PCA, stochastic processes |
+
+## Already covered by vani-compiler builtins (no package needed)
+
+Confirmed present in `checker.rs`'s builtin allowlist -- do not duplicate these in any
+new package:
+
+- **Number theory**: `i64_gcd`, `i64_lcm`, `i64_is_prime`, `i64_next_prime`,
+  `i64_prev_prime`, `i64_totient`, `i64_divisor_count`, `i64_divisor_sum`,
+  `i64_mod_inverse`, `i64_is_perfect_square`
+- **Combinatorics**: `i64_factorial`, `i64_binomial`, `i64_perm`, `i64_fibonacci`
+- **Graph algorithms**: `graph_new`/`add_edge`/`bfs_reach`/`dfs_reach`/`dijkstra`/
+  `has_cycle`/`mst_kruskal`/`mst_prim`/`astar`/`topo_sort`
+- **Special functions**: `f64_erf`/`erfc`/`tgamma`/`lgamma`, `f64_quadratic_root`
+- Generic data structures: heaps, tries, union-find, skip lists, bloom filters, BSTs
+
+This is why "elementary math", "number theory", and most of "discrete math" from a
+naive coverage table don't need their own repos -- they're already in the language.
+
+---
+
+## Planned: numeric/scientific tier
+
+Ordered by recommended build sequence (earlier entries unblock later ones).
+
+| # | Repo | Depends on | Scope | Rough size |
+|---|---|---|---|---|
+| 1 | **matrix v0.2** (extend, not new) | -- | Eigenvalues (power iteration + deflation), QR (Householder), SVD (bidiagonalization), condition number. Already scoped as "Future v0.2.0" in vani-matrix's own TODO.md. | ~8-10 functions |
+| 2 | **vani-complex** (new) | -- | `Complex { re: f64, im: f64 }` struct + arithmetic, polar form, complex exp/log/trig, roots of unity. Foundational -- vani-signal needs it. | ~20-25 functions |
+| 3 | **vani-optimize** (new) | -- | Multivariable unconstrained (gradient descent, BFGS/L-BFGS-ish, Newton's method in N-D), constrained (Lagrange multipliers, penalty methods), linear programming (simplex), basic convex optimization. | ~25-35 functions |
+| 4 | **vani-geometry** (new) | -- | Computational: convex hull, line/segment intersection, point-in-polygon, closest-pair. Analytic: conic sections, distance/angle formulas in 2D/3D. | ~25-35 functions |
+| 5 | **vani-signal** (new) | vani-complex | FFT/DFT (Cooley-Tukey radix-2 to start), convolution, Laplace transform (numeric), Z-transform (numeric), windowing functions. | ~20-30 functions |
+| 6 | **vani-tensor** (new) | matrix | N-dimensional arrays: flat `Vec<f64>` + shape `Vec<i64>` encoding (matching vani-matrix's row-major convention, not nested `Vec<Vec<...>>`), reshape, broadcast, contraction, N-D elementwise ops. | ~20-30 functions |
+| 7 | **vani-pde** (new) | matrix, calculus | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid. Biggest design surface of this tier -- needs an explicit discretization-scheme decision up front. | ~15-25 functions, more design overhead per function |
+| 8 | **vani-algebra** (new, lower priority) | calculus (reuses poly_* ops) | Polynomial root-finding beyond quadratic (cubic/quartic closed forms, numeric for higher degree via companion-matrix eigenvalues -- needs #1), linear/nonlinear equation systems. | ~15-20 functions |
+
+## Planned: symbolic tier (optional, separate scope)
+
+This is **not** a scaled-up version of the numeric tier -- it's a qualitatively
+different problem. Correctness bugs compound silently (a wrong simplification rule
+poisons everything built on top of it), and the design surface (expression
+representation, canonicalization, rule ordering) needs to be settled before most
+functions can even be written. Treat this as optional and budget it separately from
+the numeric tier above.
+
+| Repo | Depends on | Scope |
+|---|---|---|
+| **vani-bignum** | -- | Arbitrary-precision integers and rationals (digit-array + carry/borrow arithmetic in pure vāṇी, no compiler support needed). Numeric foundation everything else in this tier needs. |
+| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. |
+| **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. Could fold into vani-symbolic instead of being standalone. |
+
+---
+
+## Recommended order
+
+1. matrix v0.2 (eigen/QR/SVD) -- smallest increment, already scoped, unblocks #6 and #8.
+2. vani-complex -- foundational, unblocks #5.
+3. vani-optimize and vani-geometry -- independent of each other and of everything above; can be done in either order or in parallel.
+4. vani-signal (needs #2) and vani-tensor (needs #1).
+5. vani-pde -- benefits from matrix's linear solvers and calculus's ODE machinery already existing.
+6. vani-algebra -- lowest priority; niche once the above exist.
+7. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with vani-bignum, since vani-symbolic can't do much without exact arithmetic underneath it.
+
+## Notes for whoever picks up a repo from this list
+
+- Match the established conventions: flat `Vec<f64>` encodings with explicit dimension
+  args (not nested Vecs or hidden metadata), `#[bounded_stack(bytes=N)]` on every
+  function with the budget set to `vanic check`'s **exact** reported worst-case (hand
+  estimates are consistently wrong on the first try -- this has held for every package
+  published so far), and validate every function against a hand-computed or
+  textbook reference value before writing it into the library.
+- Add new dependencies via `vanic add <name>` (vendors + checksum-verifies against the
+  registry into `./vendor/<name>`), not a hand-copied bundle -- `vanic publish`
+  correctly includes `vendor/` in the tarball as of vani-compiler commit `5732ba4`.
+- `authors` in `vani.toml` must be a plain quoted string (`authors = "name"`), not a
+  TOML array -- the manifest parser used by `vanic publish` doesn't support arrays.

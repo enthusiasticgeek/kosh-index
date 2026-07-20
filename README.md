@@ -6,6 +6,8 @@ Sparse package registry index for the [vāṇī compiler](https://github.com/ent
 
 **Registry URL:** `https://enthusiasticgeek.github.io/kosh-index`
 
+**Browse packages:** [Package catalog](https://enthusiasticgeek.github.io/kosh-index/catalog.html) &nbsp;|&nbsp; **Planned packages:** [ROADMAP.md](ROADMAP.md)
+
 ---
 
 ## Using a package from this registry
