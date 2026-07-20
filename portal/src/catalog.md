@@ -84,6 +84,29 @@ probability = { registry = "kosh", version = "^0.4.2" }
 
 ---
 
+## complex
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+
+Complex number library for the vāṇी compiler. `Complex` is a plain
+`{ re: f64, im: f64 }` struct (no heap-owning fields, so it's freely copyable --
+no `ref`/`mut ref` ceremony anywhere in this API, unlike the `Vec<f64>`-based
+sibling libraries).
+
+Includes arithmetic (add/sub/mul/div/scale/reciprocal), modulus/argument/polar
+form, exponential/logarithm/integer-power/square-root, trigonometric and
+hyperbolic functions, and roots of unity.
+
+- **Repository:** [enthusiasticgeek/vani-complex](https://github.com/enthusiasticgeek/vani-complex)
+- **Checksum (0.1.0):** `ff1b45a2…9371cf`
+
+```toml
+[deps]
+complex = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
