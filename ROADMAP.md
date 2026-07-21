@@ -302,7 +302,7 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 
 | ID | Task | Effort | Status |
 |---|---|---|---|
-| MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage backfill** — in progress, package-by-package. | large, multi-session | **9/12 done (vani-complex, vani-vectorcalc, vani-algebra, vani-discrete, vani-sparse, vani-pde, vani-interval, vani-tensor, vani-signal)** |
+| MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage backfill** — in progress, package-by-package. | large, multi-session | **10/12 done (vani-complex, vani-vectorcalc, vani-algebra, vani-discrete, vani-sparse, vani-pde, vani-interval, vani-tensor, vani-signal, vani-optimize)** |
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
 
