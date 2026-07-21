@@ -125,7 +125,24 @@ summation. Missing:
 |---|---|---|
 | N1 | ~~Implicit/stiff ODE solvers~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | backward Euler + Crank-Nicolson, each step solved via Newton's method (not fixed-point iteration, which wouldn't converge on stiff problems); BDF2 intentionally left out, see vani-calculus TODO.md |
 | N2 | ~~ODE boundary-value-problem solver~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | shooting method: secant search over the initial slope, paired RK4 for the underlying first-order system |
-| N3 | Interval arithmetic / rigorous error-propagation | open scope, unclear real demand yet; still not scheduled |
+| N3 | Interval arithmetic / rigorous error-propagation | open scope until broken down 2026-07-20 -- see below; still not scheduled |
+
+**N3 breakdown** — this row actually bundles two distinct techniques, not
+one: rigorous interval arithmetic (an `[lo,hi]` range provably containing
+the true value, vs. a single float with hand-waved error) and first-order
+error propagation (the linearized `σ_f ≈ sqrt(Σ(∂f/∂xi)²σxi²)` formula
+science/engineering actually asks for day to day, not rigorous but far
+more commonly needed). Either can be one package or two -- doesn't matter,
+the user's call when this gets picked up. Itemized:
+
+| # | Item | Notes |
+|---|---|---|
+| N3.1 | `Interval` struct + core arithmetic (add/sub/mul/div/neg) | mul/div need all corner-pair combinations since operand signs matter; div by an interval spanning zero is unbounded -- caller-trust limitation, not a runtime error |
+| N3.2 | Interval elementary functions (sqrt/exp/log/pow/sin/cos) | monotonic ones (sqrt/exp/log) just apply to both endpoints; sin/cos need a critical-point check (does the interval span a max/min?) -- the fiddly part |
+| N3.3 | Interval set ops (contains/width/midpoint/intersect/union_hull) | |
+| N3.4 | Rigorous interval-bisection root-finding | unlike vani-calculus's point-sample `bisect`, provably doesn't miss a root inside the starting bracket |
+| N3.5 | First-order error propagation: single-var, n-var independent, n-var with covariance | n-var independent/covariance forms are natural reuses of vani-calculus's `gradient_1d`/`jacobian_1d` |
+| N3.6 | Closed-form propagation shortcuts (sum/product/quotient) | the textbook `σ_f=sqrt(σx²+σy²)` (sum) and relative-error-in-quadrature (product/quotient) forms, worth having directly rather than always going through N3.5's general path |
 
 **³ Scientific computing (aggregate)** — this row is a rollup, not a
 concrete deliverable, and is now largely redundant with the specific rows
@@ -144,13 +161,16 @@ structural pass, rather than a source of real gaps.
 - **N1-N2** (stiff/BVP ODE solvers) ✅ shipped in **vani-calculus v0.3.0**
   (2026-07-20) — same package, same `poly_*`/ODE conventions, no new
   dependency, exactly as planned above.
-- **N3** (interval arithmetic) has no obvious home yet and unclear
-  real-world pull; lowest priority of the group, still unscheduled -- the
-  only unshipped item left anywhere in this file besides the optional
-  symbolic tier.
+- **N3** (interval arithmetic + error propagation, broken into N3.1-N3.6
+  above) has no obvious home yet — candidate: a new **vani-interval**
+  package, one repo covering both techniques (N3.5-N3.6 depend on
+  vani-calculus for `gradient_1d`/`jacobian_1d` reuse; N3.1-N3.4 are
+  self-contained). Lowest priority of the group, the only unshipped item
+  left anywhere in this file besides the optional symbolic tier.
 
-N3 is not scheduled — confirm scope and priority before starting it, same
-as the (now-complete) numeric tier and the still-optional symbolic tier.
+N3.1-N3.6 are not scheduled — confirm scope and priority before starting
+any of them, same as the (now-complete) numeric tier and the
+still-optional symbolic tier.
 
 ### What's out of scope for this roadmap (research-tier math)
 
