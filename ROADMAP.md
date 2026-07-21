@@ -112,14 +112,16 @@ Missing:
 Gauss-Legendre 5-point/adaptive), differentiation (central/forward/second,
 1D gradient/Jacobian/Hessian-diag), root-finding (bisection/secant/Newton/
 Brent), 1D optimization (golden-section/Brent/Newton), ODE (Euler/RK4/
-RK45/Adams-Bashforth-2 — **all explicit**), polynomials, interpolation
-(Lagrange/linear-table/natural-cubic-spline), stable summation. Missing:
+RK45/Adams-Bashforth-2 explicit, **plus backward Euler/Crank-Nicolson
+implicit and a shooting-method BVP solver as of v0.3.0**), polynomials,
+interpolation (Lagrange/linear-table/natural-cubic-spline), stable
+summation. Missing:
 
 | # | Gap | Notes |
 |---|---|---|
-| N1 | Implicit/stiff ODE solvers (backward Euler, Crank-Nicolson, BDF2) | needed for stiff systems where explicit solvers need impractically small steps |
-| N2 | ODE boundary-value-problem solver (shooting method) | vani-pde solves PDE BCs on a grid, not general ODE BVPs |
-| N3 | Interval arithmetic / rigorous error-propagation | open scope, unclear real demand yet |
+| N1 | ~~Implicit/stiff ODE solvers~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | backward Euler + Crank-Nicolson, each step solved via Newton's method (not fixed-point iteration, which wouldn't converge on stiff problems); BDF2 intentionally left out, see vani-calculus TODO.md |
+| N2 | ~~ODE boundary-value-problem solver~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | shooting method: secant search over the initial slope, paired RK4 for the underlying first-order system |
+| N3 | Interval arithmetic / rigorous error-propagation | open scope, unclear real demand yet; still not scheduled |
 
 **³ Scientific computing (aggregate)** — this row is a rollup, not a
 concrete deliverable, and is now largely redundant with the specific rows
@@ -128,25 +130,21 @@ their own rows already). No new tracked items here; candidate for
 downgrading to a footnote or removing outright next time this file gets a
 structural pass, rather than a source of real gaps.
 
-#### Where would G1-G7 / N1-N3 actually live?
+#### Where do G1-G7 / N3 live?
 
-Not yet decided — options, not commitments:
-
-- **G1-G5** (graph algorithms) fit naturally as a new **vani-graph**
-  package built on the same `graph_new`/`add_edge`-style representation
-  the builtins already use, OR as new compiler builtins alongside the
-  existing graph builtin set (a call vani-compiler's own maintainers would
-  make, tracked in `vani-compiler/docs/TODO_CURRENT.md`, not this repo).
-- **G6-G7** (combinatorics enumeration) could fold into the same
-  vani-graph package as a "discrete" package, or stay separate as a small
-  **vani-combinatorics**.
-- **N1-N2** (stiff/BVP ODE solvers) are a natural **vani-calculus v0.3**
-  extension — same package, same `poly_*`/ODE conventions, no new
-  dependency.
+- **G1-G5** (graph algorithms) and **G6-G7** (combinatorics enumeration):
+  not yet decided/scheduled. Candidate: a new **vani-discrete** package
+  with its own adjacency-matrix representation (the compiler's builtin
+  `Graph` type is opaque from vāṇी source -- no accessor to enumerate
+  edges/neighbors -- so G1-G7 can't be built on top of it; they need their
+  own from-scratch encoding, same as every other kosh package).
+- **N1-N2** (stiff/BVP ODE solvers) ✅ shipped in **vani-calculus v0.3.0**
+  (2026-07-20) — same package, same `poly_*`/ODE conventions, no new
+  dependency, exactly as planned above.
 - **N3** (interval arithmetic) has no obvious home yet and unclear
-  real-world pull; lowest priority of the group.
+  real-world pull; lowest priority of the group, still unscheduled.
 
-None of G1-G7 or N1-N3 are scheduled — this is a gap inventory, not a
+G1-G7 and N3 are not scheduled — this remains a gap inventory, not a
 commitment to build. Confirm scope and priority before starting any of
 them, same as the (now-complete) numeric tier and the still-optional
 symbolic tier.

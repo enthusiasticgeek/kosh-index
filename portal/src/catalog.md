@@ -32,25 +32,31 @@ matrix = { registry = "kosh", version = "^0.2" }
 
 ## calculus
 
-**Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.3.0 &nbsp;|&nbsp; **Deps:** none
 
 Numerical calculus library for the vāṇी compiler.
 
 Provides integration (trapezoidal, Simpson's, Romberg, Gauss-Legendre,
 adaptive), differentiation (central/forward/second difference, gradient,
 Jacobian, Hessian diagonal), root-finding (bisection, secant, Newton,
-Brent), optimization (golden section, Brent, Newton), ODE solvers (Euler,
-RK4, RK45, Adams-Bashforth), polynomial arithmetic, interpolation
-(Lagrange, linear table, natural cubic spline), and numerically stable
-series summation (Kahan sum, running mean).
+Brent), optimization (golden section, Brent, Newton), explicit ODE solvers
+(Euler, RK4, RK45, Adams-Bashforth), implicit ODE solvers (backward Euler,
+Crank-Nicolson -- A-stable, stay bounded on stiff systems where the
+explicit solvers diverge, each step solved via Newton's method), an ODE
+boundary-value-problem solver (shooting method: secant search over the
+initial slope, paired RK4 for the underlying first-order system),
+polynomial arithmetic, interpolation (Lagrange, linear table, natural
+cubic spline), and numerically stable series summation (Kahan sum, running
+mean).
 
 - **Repository:** [enthusiasticgeek/vani-calculus](https://github.com/enthusiasticgeek/vani-calculus)
 - **Checksum (0.1.0):** `4131d2cd…e626a3e`
 - **Checksum (0.2.0):** `9cfe9db8…04ca6a`
+- **Checksum (0.3.0):** `b3a728d6…de24b20e`
 
 ```toml
 [deps]
-calculus = { registry = "kosh", version = "^0.2" }
+calculus = { registry = "kosh", version = "^0.3" }
 ```
 
 ---
