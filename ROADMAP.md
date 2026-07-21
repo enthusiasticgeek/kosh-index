@@ -305,6 +305,7 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 | MAINT-1 | ~~WCET (`#[wcet(cycles=N)]`) coverage backfill~~ ✅ done 2026-07-21, all 12 packages | large, multi-session | **done, 12/12** |
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
+| MAINT-4 | ~~No sanity check enforced `#[bounded_stack]`/`#[wcet]` coverage before a package landed in kosh-index — MAINT-1 was a one-time manual pass with no lasting gate~~ ✅ done 2026-07-21, `vanic audit-safety` + `vanic publish` gate | ~1 session | **done** |
 
 **MAINT-1 methodology + progress (2026-07-21)**: vani-complex (24 functions, self-contained,
 no deps) done first as the pattern-setter. **Real finding that changes the original
@@ -365,8 +366,32 @@ passed), patch version bumped, republished. New versions: probability 0.4.3, opt
 vani-geometry, vani-discrete) needed no change (confirmed no vendor `use` line in any
 of them).
 
-**Why these are separate from the package-scope roadmap above**: MAINT-1/2/3 don't add
+**MAINT-4 done (2026-07-21)**: MAINT-1 was a one-time manual audit with nothing stopping
+the *next* publish from skipping WCET/stack-safety coverage entirely. Added
+`vanic audit-safety <path> [--format=text|json]` (vani-compiler), which reuses the
+existing `wcet_body`/`compute_stack_depths` analyses to determine, per function,
+whether `#[bounded_stack]`/`#[wcet]` is *computable* (i.e., the function is eligible)
+and flags any eligible-but-missing case — not blanket 100% attribute presence, since
+fn-pointer params make `#[bounded_stack]` uncomputable and unbounded loops/recursion
+make `#[wcet]` uncomputable, and both are legitimately exempt. Vendored `[deps]`
+functions are excluded. `vanic publish` now runs this audit before building the
+tarball and hard-blocks on any gap, with `--allow-partial-safety-coverage` as an
+explicit escape hatch. Packages are libraries (`src/lib.vani`, no `fn main()`), so
+`compile_library`/`compile_library_path` (checker::check_library skips the
+main-required check, otherwise identical to `compile`/`compile_path`) were added to
+support auditing them directly.
+
+Running the new tool against all 12 already-published MAINT-1 packages validated the
+manual audit — and found 4 real gaps it missed: vani-discrete's `_disc_has_edge` and
+`_disc_transpose` (missing `#[bounded_stack]`), vani-optimize's `penalty_value`
+(missing `#[wcet]` — it takes fn-pointer params so is correctly `#[bounded_stack]`-exempt,
+but indirect calls get a flat 10-cycle WCET charge, making it `#[wcet]`-eligible), and
+vani-probability's `markov_is_absorbing_state` (missing `#[wcet]`, 1 of 106 functions).
+All four fixed, republished: discrete 0.1.2, optimize 0.1.3, probability 0.4.5. All 12
+packages now pass `vanic audit-safety` cleanly.
+
+**Why these are separate from the package-scope roadmap above**: MAINT-1/2/3/4 don't add
 new mathematical coverage — they're consistency/correctness upkeep on packages already
-shipped. All three are now done — every package-scope item AND every maintenance item
+shipped. All four are now done — every package-scope item AND every maintenance item
 in this document is shipped; only the optional symbolic tier remains anywhere in this
 roadmap.
