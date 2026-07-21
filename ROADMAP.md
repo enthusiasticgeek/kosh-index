@@ -302,9 +302,45 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 
 | ID | Task | Effort | Status |
 |---|---|---|---|
-| MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage is thin and inconsistent** — census across all 14 shipped packages' `src/lib.vani`: `#[bounded_stack]` is near-universal (opt-in per fn, not compiler-enforced; fn-pointer-taking fns correctly omit it per the documented convention), but `#[wcet]` exists only in vani-matrix (6 fns) and vani-calculus (10 fns) — every other package (vani-probability, vani-complex, vani-optimize, vani-geometry, vani-signal, vani-tensor, vani-pde, vani-algebra, vani-sparse, vani-vectorcalc, vani-discrete, vani-interval) has zero. Backfilling cycle-accurate WCET across ~400+ functions in 12 packages is a large, per-function, package-specific audit (`vanic check` doesn't hand you a WCET number the way it does for `#[bounded_stack]` — cycle counts need to be derived by hand per builtin call chain, same discipline as vani-calculus's existing `#[wcet]` comments). **Not started — confirm priority/scope (which packages first, or all-at-once) before beginning; this is a multi-session undertaking, not a quick pass.** | large, multi-session | not started |
+| MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage backfill** — in progress, package-by-package. | large, multi-session | **1/12 done (vani-complex)** |
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
+
+**MAINT-1 methodology + progress (2026-07-21)**: vani-complex (24 functions, self-contained,
+no deps) done first as the pattern-setter. **Real finding that changes the original
+estimate**: `#[wcet]` is NOT a hand-derive-from-a-cost-table exercise — like
+`#[bounded_stack]`, it's a real `vanic check`-enforced budget (`enforce_wcet` in
+`safety.rs`), so the only correct workflow is the same "set a deliberately-low
+placeholder, read the tool's exact reported number, fix it" loop used for
+`#[bounded_stack]`. One extra wrinkle WCET has that `#[bounded_stack]` doesn't:
+the estimator uses a callee's *declared* `#[wcet]` budget for cross-function calls
+rather than re-deriving the callee's real body cost, so composite functions
+(`complex_div`, `complex_tan`, etc.) give a wrong number on the first pass and need
+a second pass once their dependencies are fixed to correct values — genuinely
+bottom-up, not a single mechanical sweep. vani-complex took 3 rounds (leaf fns →
+one-level-composite fns → `complex_tan`/`complex_tanh`, which depend on
+`complex_div`) to converge.
+
+**Checker limitation discovered along the way** (documented in vani-complex's
+module header, and worth a compiler-side TODO): the WCET estimator gives a flat
+cost to any top-level struct-literal return expression and does **not** recurse
+into its field expressions. `complex_log`'s real enforced budget is only 10 cycles
+despite its body calling `complex_abs`+`complex_arg`+`log()`, because that whole
+call chain sits inside a `Complex { ... }` literal. This means `#[wcet]` budgets
+on any struct-literal-returning function in this ecosystem are under-counted by
+the checker itself, not just by whoever wrote the annotation — the tool will
+happily accept a budget far lower than the function's real cost. Not a vani-complex
+bug; a `vanic check` gap that affects every future package doing this backfill.
+
+**Honest pace assessment**: vani-complex (24 fns, all pure arithmetic, zero
+dependencies) took a full multi-round investigation-and-verification cycle to get
+right. The remaining 11 packages are mostly larger (vani-probability alone has 106
+functions) and many have loops over `Vec<f64>` (which get a WCET *formula* comment,
+not an attribute, per the established convention — still requires per-function
+judgment about which category a function falls into). The original "large,
+multi-session" scope estimate holds; this is not a task that compresses into a
+single sitting even at a good pace. Continuing package-by-package;
+commit+publish happens after each package, same as MAINT-2.
 
 **MAINT-2 done (2026-07-21)**: 9 packages actually had the redundant line (not 7 —
 vani-probability→vani-matrix and vani-optimize→vani-matrix were missed in the original
