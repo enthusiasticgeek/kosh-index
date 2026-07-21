@@ -303,8 +303,20 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 | ID | Task | Effort | Status |
 |---|---|---|---|
 | MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage is thin and inconsistent** — census across all 14 shipped packages' `src/lib.vani`: `#[bounded_stack]` is near-universal (opt-in per fn, not compiler-enforced; fn-pointer-taking fns correctly omit it per the documented convention), but `#[wcet]` exists only in vani-matrix (6 fns) and vani-calculus (10 fns) — every other package (vani-probability, vani-complex, vani-optimize, vani-geometry, vani-signal, vani-tensor, vani-pde, vani-algebra, vani-sparse, vani-vectorcalc, vani-discrete, vani-interval) has zero. Backfilling cycle-accurate WCET across ~400+ functions in 12 packages is a large, per-function, package-specific audit (`vanic check` doesn't hand you a WCET number the way it does for `#[bounded_stack]` — cycle counts need to be derived by hand per builtin call chain, same discipline as vani-calculus's existing `#[wcet]` comments). **Not started — confirm priority/scope (which packages first, or all-at-once) before beginning; this is a multi-session undertaking, not a quick pass.** | large, multi-session | not started |
-| MAINT-2 | **Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one** (vani-signal→vani-complex, vani-tensor→vani-matrix, vani-pde→vani-matrix, vani-algebra→vani-matrix+vani-calculus, vani-sparse→vani-matrix, vani-vectorcalc→vani-calculus, vani-interval→vani-calculus — every package with a `[deps]` entry). Mechanical: delete the `use` line, re-run `vanic check`/`vanic test` to confirm nothing broke (per MAINT-notes above, it shouldn't — the manifest-driven auto-include already made it a no-op), bump patch version, republish. Self-contained packages (vani-matrix, vani-probability, vani-complex, vani-optimize, vani-geometry, vani-discrete) need no change. | ~15-30 min/package | not started |
-| MAINT-3 | **`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped** — add a one-line note next to the `[deps]` example block. Lives in `vani-compiler/docs/kosh_design.md`, not this repo. | ~10 min | not started |
+| MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
+| MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
+
+**MAINT-2 done (2026-07-21)**: 9 packages actually had the redundant line (not 7 —
+vani-probability→vani-matrix and vani-optimize→vani-matrix were missed in the original
+scan above): vani-probability, vani-optimize, vani-signal, vani-tensor, vani-pde,
+vani-algebra (2 lines: matrix + calculus), vani-sparse, vani-vectorcalc, vani-interval.
+Each: line removed, `vanic check --no-verify` run on every test file in every package
+(all clean), one full `vanic test` run per package as a runtime confidence check (all
+passed), patch version bumped, republished. New versions: probability 0.4.3, optimize
+0.1.1, signal 0.1.1, tensor 0.1.1, pde 0.1.1, algebra 0.1.1, sparse 0.1.1, vectorcalc
+0.1.1, interval 0.1.1. Self-contained packages (vani-matrix, vani-complex,
+vani-geometry, vani-discrete) needed no change (confirmed no vendor `use` line in any
+of them).
 
 **Why these are separate from the package-scope roadmap above**: MAINT-1/2/3 don't add
 new mathematical coverage — they're consistency/correctness upkeep on packages already
