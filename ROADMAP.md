@@ -9,14 +9,12 @@ Compiler-level items that this roadmap depends on (if any) are tracked in
 [vani-compiler's docs/TODO_CURRENT.md](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/TODO_CURRENT.md)
 under "Kosh math-library ecosystem" and cross-linked from here.
 
-Last updated: 2026-07-20
+Last updated: 2026-07-21
 
 **Status: the numeric/scientific tier (all 12 packages below) is complete,
-and every row in the gap-analysis table below is now ✅** (three rows carry
-a qualifier — see "Known gaps within 'mostly done' rows"; of the itemized
-G1-G7/N1-N3 gaps that section originally listed, only **N3** (interval
-arithmetic) remains unshipped and unscheduled). What remains overall is
-N3 plus the optional, much larger symbolic tier — see "Planned: symbolic
+every row in the gap-analysis table below is ✅, and every itemized gap
+within those rows (G1-G7, N1-N2, and now N3) is shipped.** What remains
+is only the optional, much larger symbolic tier — see "Planned: symbolic
 tier" below.
 
 ---
@@ -38,6 +36,7 @@ tier" below.
 | [sparse](https://github.com/enthusiasticgeek/vani-sparse) | 0.1.0 | Sparse matrices: COO (build) / CSR (operate) formats, dense conversions, matvec, transpose, scale, add, matmul (Gustavson's algorithm); every op cross-checked against the equivalent dense vani-matrix operation |
 | [vectorcalc](https://github.com/enthusiasticgeek/vani-vectorcalc) | 0.1.0 | Vector calculus: gradient/divergence/curl/Laplacian (2D/3D, central differences), double/triple/line integrals via nested reuse of calculus's integrate_simpson; composed checks for curl(grad f)=0 and the 2D divergence theorem |
 | [discrete](https://github.com/enthusiasticgeek/vani-discrete) | 0.1.0 | Graph algorithms (Floyd-Warshall, Kosaraju SCC, Edmonds-Karp max-flow/min-cut, Kuhn's bipartite matching, greedy coloring) and combinatorics enumeration (permutations, combinations, subsets, partition counting), own adjacency-matrix encoding |
+| [interval](https://github.com/enthusiasticgeek/vani-interval) | 0.1.0 | Rigorous interval arithmetic (core arithmetic, elementary functions, set ops, interval-bisection root-finding returning every surviving candidate bracket) and first-order error propagation (single-var, n-var independent/covariance, closed-form sum/product/quotient shortcuts) |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -78,7 +77,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Differential equations — ODE | ✅ done | vani-calculus |
 | Differential equations — PDE | ✅ done (v0.1.0) | vani-pde |
 | Complex analysis | ✅ done (v0.1.0) | vani-complex |
-| Numerical analysis | ✅ mostly done² | vani-calculus |
+| Numerical analysis | ✅ done² | vani-calculus + vani-interval |
 | Probability | ✅ done | vani-probability |
 | Statistics | ✅ done | vani-probability |
 | Optimization — 1D | ✅ done | vani-calculus |
@@ -119,30 +118,30 @@ Brent), 1D optimization (golden-section/Brent/Newton), ODE (Euler/RK4/
 RK45/Adams-Bashforth-2 explicit, **plus backward Euler/Crank-Nicolson
 implicit and a shooting-method BVP solver as of v0.3.0**), polynomials,
 interpolation (Lagrange/linear-table/natural-cubic-spline), stable
-summation. Missing:
+summation, and (as of vani-interval v0.1.0) rigorous interval arithmetic
+plus first-order error propagation. All itemized gaps below are shipped:
 
 | # | Gap | Notes |
 |---|---|---|
 | N1 | ~~Implicit/stiff ODE solvers~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | backward Euler + Crank-Nicolson, each step solved via Newton's method (not fixed-point iteration, which wouldn't converge on stiff problems); BDF2 intentionally left out, see vani-calculus TODO.md |
 | N2 | ~~ODE boundary-value-problem solver~~ ✅ shipped in vani-calculus v0.3.0 (2026-07-20) | shooting method: secant search over the initial slope, paired RK4 for the underlying first-order system |
-| N3 | Interval arithmetic / rigorous error-propagation | open scope until broken down 2026-07-20 -- see below; still not scheduled |
+| N3 | ~~Interval arithmetic / rigorous error-propagation~~ ✅ shipped in **vani-interval v0.1.0** (2026-07-21) | broken into N3.1-N3.6 below, all shipped in one repo |
 
-**N3 breakdown** — this row actually bundles two distinct techniques, not
+**N3 breakdown** — this row actually bundled two distinct techniques, not
 one: rigorous interval arithmetic (an `[lo,hi]` range provably containing
 the true value, vs. a single float with hand-waved error) and first-order
 error propagation (the linearized `σ_f ≈ sqrt(Σ(∂f/∂xi)²σxi²)` formula
 science/engineering actually asks for day to day, not rigorous but far
-more commonly needed). Either can be one package or two -- doesn't matter,
-the user's call when this gets picked up. Itemized:
+more commonly needed). Shipped as one package, `vani-interval`. Itemized:
 
 | # | Item | Notes |
 |---|---|---|
-| N3.1 | `Interval` struct + core arithmetic (add/sub/mul/div/neg) | mul/div need all corner-pair combinations since operand signs matter; div by an interval spanning zero is unbounded -- caller-trust limitation, not a runtime error |
-| N3.2 | Interval elementary functions (sqrt/exp/log/pow/sin/cos) | monotonic ones (sqrt/exp/log) just apply to both endpoints; sin/cos need a critical-point check (does the interval span a max/min?) -- the fiddly part |
-| N3.3 | Interval set ops (contains/width/midpoint/intersect/union_hull) | |
-| N3.4 | Rigorous interval-bisection root-finding | unlike vani-calculus's point-sample `bisect`, provably doesn't miss a root inside the starting bracket |
-| N3.5 | First-order error propagation: single-var, n-var independent, n-var with covariance | n-var independent/covariance forms are natural reuses of vani-calculus's `gradient_1d`/`jacobian_1d` |
-| N3.6 | Closed-form propagation shortcuts (sum/product/quotient) | the textbook `σ_f=sqrt(σx²+σy²)` (sum) and relative-error-in-quadrature (product/quotient) forms, worth having directly rather than always going through N3.5's general path |
+| N3.1 | ~~`Interval` struct + core arithmetic (add/sub/mul/div/neg)~~ ✅ `iv_new`/`iv_add`/`iv_sub`/`iv_mul`/`iv_div`/`iv_neg`/etc. | mul/div need all corner-pair combinations since operand signs matter; div by an interval spanning zero is unbounded -- caller-trust limitation, not a runtime error |
+| N3.2 | ~~Interval elementary functions (sqrt/exp/log/pow/sin/cos)~~ ✅ `iv_sqrt`/`iv_exp`/`iv_log`/`iv_pow_i64`/`iv_sin`/`iv_cos` | monotonic ones (sqrt/exp/log) just apply to both endpoints; sin/cos need a critical-point check (does the interval span a max/min?) -- the fiddly part, solved with a fixed-size critical-point search |
+| N3.3 | ~~Interval set ops (contains/width/midpoint/intersect/union_hull)~~ ✅ `iv_contains`/`iv_width`/`iv_midpoint`/`iv_is_empty`/`iv_intersect`/`iv_union_hull` | |
+| N3.4 | ~~Rigorous interval-bisection root-finding~~ ✅ `iv_bisect_root` | unlike vani-calculus's point-sample `bisect`, provably doesn't miss a root inside the starting bracket -- returns `Vec<Interval>` (every surviving candidate), not a single `Interval`, since a single-bracket version turns out not to be rigorous once interval arithmetic's "dependency problem" is accounted for; see vani-interval's README |
+| N3.5 | ~~First-order error propagation: single-var, n-var independent, n-var with covariance~~ ✅ `ep_propagate_1var`/`ep_propagate_independent`/`ep_propagate_covariance` | n-var forms reuse vani-optimize's `fn(ref Vec<f64>, i64)->f64` multivariate convention via a small private helper, not vani-calculus's `gradient_1d`/`jacobian_1d` as originally sketched here -- those turned out to be single-var-sampled-at-multiple-points, not multivariate partials, so they didn't actually fit |
+| N3.6 | ~~Closed-form propagation shortcuts (sum/product/quotient)~~ ✅ `ep_sum2`/`ep_sum_n`/`ep_product2`/`ep_quotient2` | the textbook `σ_f=sqrt(σx²+σy²)` (sum) and relative-error-in-quadrature (product/quotient) forms, worth having directly rather than always going through N3.5's general path |
 
 **³ Scientific computing (aggregate)** — this row is a rollup, not a
 concrete deliverable, and is now largely redundant with the specific rows
@@ -151,7 +150,7 @@ their own rows already). No new tracked items here; candidate for
 downgrading to a footnote or removing outright next time this file gets a
 structural pass, rather than a source of real gaps.
 
-#### Where did G1-G7 / N1-N2 land, and what's left (N3)?
+#### Where did G1-G7 / N1-N3 land?
 
 - **G1-G7** (graph algorithms + combinatorics enumeration) ✅ shipped in
   **vani-discrete v0.1.0** (2026-07-20) — its own adjacency-matrix
@@ -162,15 +161,11 @@ structural pass, rather than a source of real gaps.
   (2026-07-20) — same package, same `poly_*`/ODE conventions, no new
   dependency, exactly as planned above.
 - **N3** (interval arithmetic + error propagation, broken into N3.1-N3.6
-  above) has no obvious home yet — candidate: a new **vani-interval**
-  package, one repo covering both techniques (N3.5-N3.6 depend on
-  vani-calculus for `gradient_1d`/`jacobian_1d` reuse; N3.1-N3.4 are
-  self-contained). Lowest priority of the group, the only unshipped item
-  left anywhere in this file besides the optional symbolic tier.
-
-N3.1-N3.6 are not scheduled — confirm scope and priority before starting
-any of them, same as the (now-complete) numeric tier and the
-still-optional symbolic tier.
+  above) ✅ shipped in **vani-interval v0.1.0** (2026-07-21) — new repo,
+  depends on vani-calculus for `diff_central` only (N3.1-N3.4 are fully
+  self-contained). Every gap in this document, and every itemized gap
+  within a "mostly done" row, is now shipped — only the optional symbolic
+  tier remains anywhere in this file.
 
 ### What's out of scope for this roadmap (research-tier math)
 
@@ -240,7 +235,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **New numeric repos** | ✅ vani-complex, vani-optimize, vani-geometry, vani-signal | ~20-40 functions each, same validate-against-known-values discipline as the existing repos | ~1 unit each |
 | **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
 | **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
-| **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0 | ~8-17 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), and a stiff-system stability demonstration (calculus v0.3.0) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
+| **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0, vani-interval | ~8-28 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), a stiff-system stability demonstration (calculus v0.3.0), and a rigorous-vs-linearized cross-check on the same problem plus a deliberate interval-arithmetic "dependency problem" test case (interval) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
 | **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra (not started; optional) | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
@@ -259,8 +254,8 @@ repos too.
 5. ~~**vani-pde**~~ ✅ shipped 2026-07-20 -- used matrix's mat_solve for the elliptic solvers; calculus's ODE machinery didn't end up fitting (see vani-pde README).
 6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- completed the original 8-item ordered sequence.
 7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" and "Calculus — vector" gap-analysis rows, requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
-8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7) and ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2) -- itemized follow-up gaps under the "mostly done" rows, requested separately after step 7. Only **N3** (interval arithmetic) remains unshipped anywhere in this document besides the symbolic tier.
-9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.**
+8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7), ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2), and ~~**vani-interval**~~ ✅ shipped 2026-07-21 (N3) -- itemized follow-up gaps under the "mostly done" rows, each requested separately after step 7. Every itemized gap in this document is now shipped.
+9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.** This is the only work left anywhere in this document.
 
 ---
 
