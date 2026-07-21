@@ -312,6 +312,33 @@ vectorcalc = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## discrete
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+
+Graph algorithms and combinatorics enumeration library for the vāṇी
+compiler. Uses its own flat row-major `Vec<f64>` adjacency-matrix encoding
+rather than the compiler's builtin `Graph` type, which is opaque from vāṇी
+source (no accessor to enumerate edges/neighbors).
+
+Includes all-pairs shortest path (Floyd-Warshall), strongly-connected
+components (Kosaraju), max-flow/min-cut (Edmonds-Karp), bipartite matching
+(Kuhn's algorithm), greedy graph coloring, permutation/combination/subset
+enumeration (iterator-style, matching `std::next_permutation`), and integer
+partition counting. Validated against textbook examples plus two composed
+checks: the max-flow-min-cut theorem, and permutation/combination totals
+cross-checked against the compiler's `i64_factorial`/`i64_binomial`.
+
+- **Repository:** [enthusiasticgeek/vani-discrete](https://github.com/enthusiasticgeek/vani-discrete)
+- **Checksum (0.1.0):** `7fba0d10…7a7c21ecf60`
+
+```toml
+[deps]
+discrete = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none

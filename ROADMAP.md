@@ -13,10 +13,11 @@ Last updated: 2026-07-20
 
 **Status: the numeric/scientific tier (all 12 packages below) is complete,
 and every row in the gap-analysis table below is now ✅** (three rows carry
-a "mostly done" qualifier — see "Known gaps within 'mostly done' rows" for
-the itemized list of what's still missing under those). What remains is
-the optional, much larger symbolic tier — see "Planned: symbolic tier"
-below — plus the smaller, unscheduled items in that gaps section.
+a qualifier — see "Known gaps within 'mostly done' rows"; of the itemized
+G1-G7/N1-N3 gaps that section originally listed, only **N3** (interval
+arithmetic) remains unshipped and unscheduled). What remains overall is
+N3 plus the optional, much larger symbolic tier — see "Planned: symbolic
+tier" below.
 
 ---
 
@@ -36,6 +37,7 @@ below — plus the smaller, unscheduled items in that gaps section.
 | [algebra](https://github.com/enthusiasticgeek/vani-algebra) | 0.1.0 | Polynomial root-finding (closed-form cubic; degree >= 4 via companion matrix + mat_eig_power + synthetic deflation + Newton polish, real roots only) and nonlinear equation systems (Newton-Raphson, analytic/finite-difference Jacobian, via mat_solve) |
 | [sparse](https://github.com/enthusiasticgeek/vani-sparse) | 0.1.0 | Sparse matrices: COO (build) / CSR (operate) formats, dense conversions, matvec, transpose, scale, add, matmul (Gustavson's algorithm); every op cross-checked against the equivalent dense vani-matrix operation |
 | [vectorcalc](https://github.com/enthusiasticgeek/vani-vectorcalc) | 0.1.0 | Vector calculus: gradient/divergence/curl/Laplacian (2D/3D, central differences), double/triple/line integrals via nested reuse of calculus's integrate_simpson; composed checks for curl(grad f)=0 and the 2D divergence theorem |
+| [discrete](https://github.com/enthusiasticgeek/vani-discrete) | 0.1.0 | Graph algorithms (Floyd-Warshall, Kosaraju SCC, Edmonds-Karp max-flow/min-cut, Kuhn's bipartite matching, greedy coloring) and combinatorics enumeration (permutations, combinations, subsets, partition counting), own adjacency-matrix encoding |
 
 ## Already covered by vani-compiler builtins (no package needed)
 
@@ -66,7 +68,7 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 |---|---|---|
 | Elementary mathematics | ✅ done | builtin |
 | Number theory | ✅ done | builtin |
-| Discrete math (graphs, basic combinatorics) | ✅ mostly done¹ | builtin |
+| Discrete math (graphs, basic combinatorics) | ✅ done¹ (v0.1.0) | builtin + vani-discrete |
 | Algebra (equations, polynomial roots) | ✅ done (v0.1.0, real roots only) | vani-algebra |
 | Linear algebra — dense | ✅ done | vani-matrix |
 | Linear algebra — eigenvalues/QR/SVD (dense) | ✅ done (v0.2.0) | vani-matrix |
@@ -93,20 +95,22 @@ this section spells out exactly what's still missing under each, as a
 tracked TODO list distinct from the (already-tracked, already-shipped)
 items elsewhere in this document.
 
-**¹ Discrete math (graphs, basic combinatorics)** — covered: BFS/DFS/
-Dijkstra/A*/cycle-detection/MST(Kruskal+Prim)/topo-sort (graphs),
-factorial/binomial/perm/fibonacci (combinatorics, **counting only**).
-Missing:
+**¹ Discrete math (graphs, basic combinatorics)** — builtin coverage:
+BFS/DFS/Dijkstra/A*/cycle-detection/MST(Kruskal+Prim)/topo-sort (graphs),
+factorial/binomial/perm/fibonacci (combinatorics, counting only). **All
+7 gaps below shipped in vani-discrete v0.1.0 (2026-07-20)**, on the
+package's own adjacency-matrix encoding (the builtin `Graph` type is
+opaque from vāṇी source, so these couldn't be built on top of it):
 
 | # | Gap | Notes |
 |---|---|---|
-| G1 | All-pairs shortest path (Floyd-Warshall) | |
-| G2 | Strongly-connected components (Tarjan or Kosaraju) | |
-| G3 | Max-flow / min-cut (Ford-Fulkerson or Dinic's) | |
-| G4 | Bipartite matching (Hopcroft-Karp or augmenting-path) | |
-| G5 | Graph coloring (greedy, or backtracking for exact) | |
-| G6 | Permutation/combination/subset **enumeration** (not just counting) | e.g. next-permutation, generate all k-subsets |
-| G7 | Integer partition functions | |
+| G1 | ~~All-pairs shortest path~~ ✅ `disc_floyd_warshall` | Floyd-Warshall, not Johnson's |
+| G2 | ~~Strongly-connected components~~ ✅ `disc_scc_kosaraju` | Kosaraju (two iterative DFS passes + transpose), not Tarjan's |
+| G3 | ~~Max-flow / min-cut~~ ✅ `disc_max_flow` / `disc_min_cut_nodes` | Edmonds-Karp, not Dinic's; min-cut verified against the max-flow-min-cut theorem in tests |
+| G4 | ~~Bipartite matching~~ ✅ `disc_bipartite_matching` | Kuhn's augmenting-path algorithm, not Hopcroft-Karp |
+| G5 | ~~Graph coloring~~ ✅ `disc_greedy_coloring` | greedy by node index -- a valid coloring, not a minimum-color one (exact coloring is NP-hard) |
+| G6 | ~~Permutation/combination/subset enumeration~~ ✅ `disc_next_permutation` / `disc_next_combination` / `disc_subset_from_bitmask` | iterator-style (`std::next_permutation` convention), not materialized into a nested `Vec<Vec<i64>>` |
+| G7 | ~~Integer partition functions~~ ✅ `disc_partition_count` | counting (p(n) via O(n²) DP) only, not enumeration -- see vani-discrete README for why |
 
 **² Numerical analysis** — covered: integration (trapz/Simpson/Romberg/
 Gauss-Legendre 5-point/adaptive), differentiation (central/forward/second,
@@ -130,24 +134,23 @@ their own rows already). No new tracked items here; candidate for
 downgrading to a footnote or removing outright next time this file gets a
 structural pass, rather than a source of real gaps.
 
-#### Where do G1-G7 / N3 live?
+#### Where did G1-G7 / N1-N2 land, and what's left (N3)?
 
-- **G1-G5** (graph algorithms) and **G6-G7** (combinatorics enumeration):
-  not yet decided/scheduled. Candidate: a new **vani-discrete** package
-  with its own adjacency-matrix representation (the compiler's builtin
-  `Graph` type is opaque from vāṇी source -- no accessor to enumerate
-  edges/neighbors -- so G1-G7 can't be built on top of it; they need their
-  own from-scratch encoding, same as every other kosh package).
+- **G1-G7** (graph algorithms + combinatorics enumeration) ✅ shipped in
+  **vani-discrete v0.1.0** (2026-07-20) — its own adjacency-matrix
+  representation, since the compiler's builtin `Graph` type is opaque from
+  vāṇी source (no accessor to enumerate edges/neighbors) and G1-G7
+  couldn't be built on top of it.
 - **N1-N2** (stiff/BVP ODE solvers) ✅ shipped in **vani-calculus v0.3.0**
   (2026-07-20) — same package, same `poly_*`/ODE conventions, no new
   dependency, exactly as planned above.
 - **N3** (interval arithmetic) has no obvious home yet and unclear
-  real-world pull; lowest priority of the group, still unscheduled.
+  real-world pull; lowest priority of the group, still unscheduled -- the
+  only unshipped item left anywhere in this file besides the optional
+  symbolic tier.
 
-G1-G7 and N3 are not scheduled — this remains a gap inventory, not a
-commitment to build. Confirm scope and priority before starting any of
-them, same as the (now-complete) numeric tier and the still-optional
-symbolic tier.
+N3 is not scheduled — confirm scope and priority before starting it, same
+as the (now-complete) numeric tier and the still-optional symbolic tier.
 
 ### What's out of scope for this roadmap (research-tier math)
 
@@ -217,7 +220,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **New numeric repos** | ✅ vani-complex, vani-optimize, vani-geometry, vani-signal | ~20-40 functions each, same validate-against-known-values discipline as the existing repos | ~1 unit each |
 | **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
 | **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
-| **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc | ~11-17 functions each; validated via cross-checks against dense vani-matrix ops (sparse) and composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc) rather than isolated hand-computed values alone | ~1 unit each |
+| **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0 | ~8-17 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), and a stiff-system stability demonstration (calculus v0.3.0) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
 | **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra (not started; optional) | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
@@ -235,8 +238,9 @@ repos too.
 4. ~~**vani-signal**~~ ✅ shipped 2026-07-20 (needed #2) and ~~**vani-tensor**~~ ✅ shipped 2026-07-20 (needed #1).
 5. ~~**vani-pde**~~ ✅ shipped 2026-07-20 -- used matrix's mat_solve for the elliptic solvers; calculus's ODE machinery didn't end up fitting (see vani-pde README).
 6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- completed the original 8-item ordered sequence.
-7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the two remaining gap-analysis rows ("Linear algebra — sparse matrices", "Calculus — vector"), requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
-8. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.**
+7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" and "Calculus — vector" gap-analysis rows, requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
+8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7) and ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2) -- itemized follow-up gaps under the "mostly done" rows, requested separately after step 7. Only **N3** (interval arithmetic) remains unshipped anywhere in this document besides the symbolic tier.
+9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.**
 
 ---
 
