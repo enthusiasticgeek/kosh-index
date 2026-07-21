@@ -302,7 +302,7 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 
 | ID | Task | Effort | Status |
 |---|---|---|---|
-| MAINT-1 | **WCET (`#[wcet(cycles=N)]`) coverage backfill** — in progress, package-by-package. | large, multi-session | **11/12 done (vani-complex, vani-vectorcalc, vani-algebra, vani-discrete, vani-sparse, vani-pde, vani-interval, vani-tensor, vani-signal, vani-optimize, vani-geometry)** |
+| MAINT-1 | ~~WCET (`#[wcet(cycles=N)]`) coverage backfill~~ ✅ done 2026-07-21, all 12 packages | large, multi-session | **done, 12/12** |
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
 
@@ -332,15 +332,26 @@ the checker itself, not just by whoever wrote the annotation — the tool will
 happily accept a budget far lower than the function's real cost. Not a vani-complex
 bug; a `vanic check` gap that affects every future package doing this backfill.
 
-**Honest pace assessment**: vani-complex (24 fns, all pure arithmetic, zero
-dependencies) took a full multi-round investigation-and-verification cycle to get
-right. The remaining 11 packages are mostly larger (vani-probability alone has 106
-functions) and many have loops over `Vec<f64>` (which get a WCET *formula* comment,
-not an attribute, per the established convention — still requires per-function
-judgment about which category a function falls into). The original "large,
-multi-session" scope estimate holds; this is not a task that compresses into a
-single sitting even at a good pace. Continuing package-by-package;
-commit+publish happens after each package, same as MAINT-2.
+**MAINT-1 done (2026-07-21), all 12 packages**: vani-complex (24 fns, 24 real
+`#[wcet]`), vani-vectorcalc (11 fns, 8 real), vani-algebra (11 fns, 0 real —
+every fn loops over a Vec length or iteration count), vani-discrete (18 fns, 3
+real), vani-sparse (16 fns, 3 real), vani-pde (21 fns, 5 real), vani-interval
+(34 fns, 24 real), vani-tensor (23 fns, 0 real), vani-signal (23 fns, 0 real),
+vani-optimize (23 fns, 2 real), vani-geometry (39 fns, 32 real), vani-probability
+(106 fns, 24 real — this package already carried hand-written "WCET ~ N cycles"
+comments from earlier work, turning most of the job into verifying/correcting
+existing estimates rather than writing from scratch). ~230 functions got a real
+`vanic check`-exact `#[wcet(cycles=N)]`; the rest got a WCET formula comment
+(loop/recursion/fn-pointer-bearing, unbounded to the checker's WCET model).
+Two real compiler findings surfaced along the way (both tracked, neither fixed,
+in `vani-compiler/docs/TODO_CURRENT.md`): BUG-2 (the WCET estimator doesn't
+recurse into struct-literal field expressions, found on vani-complex) and the
+Big-O tool's nesting-depth heuristic disagreeing with correct algorithmic
+analysis on amortized bounds (found on vani-discrete's `disc_scc_kosaraju`).
+Every package verified via `vanic check` on every test file plus at least one
+full `vanic test` run per package before commit+publish. The original "large,
+multi-session" estimate held — this took the rest of the session across many
+tool-call rounds, not a quick pass.
 
 **MAINT-2 done (2026-07-21)**: 9 packages actually had the redundant line (not 7 —
 vani-probability→vani-matrix and vani-optimize→vani-matrix were missed in the original
@@ -356,5 +367,6 @@ of them).
 
 **Why these are separate from the package-scope roadmap above**: MAINT-1/2/3 don't add
 new mathematical coverage — they're consistency/correctness upkeep on packages already
-shipped. Confirm before starting MAINT-1 specifically (large, ambiguous scope); MAINT-2
-and MAINT-3 are small and mechanical enough to just do.
+shipped. All three are now done — every package-scope item AND every maintenance item
+in this document is shipped; only the optional symbolic tier remains anywhere in this
+roadmap.
