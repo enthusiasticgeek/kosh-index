@@ -306,6 +306,7 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
 | MAINT-4 | ~~No sanity check enforced `#[bounded_stack]`/`#[wcet]` coverage before a package landed in kosh-index — MAINT-1 was a one-time manual pass with no lasting gate~~ ✅ done 2026-07-21, `vanic audit-safety` + `vanic publish` gate | ~1 session | **done** |
+| MAINT-5 | ~~No namespace boundary between packages — a name collision (with a vāṇी builtin, or between two unrelated packages) was an unrecoverable compile error, and a "diamond" shared dependency silently produced missing-function errors~~ ✅ done 2026-07-21, Kosh namespacing arc (6 phases) + full ecosystem migration | large, multi-session | **done, 12/12** |
 
 **MAINT-1 methodology + progress (2026-07-21)**: vani-complex (24 functions, self-contained,
 no deps) done first as the pattern-setter. **Real finding that changes the original
@@ -390,8 +391,54 @@ vani-probability's `markov_is_absorbing_state` (missing `#[wcet]`, 1 of 106 func
 All four fixed, republished: discrete 0.1.2, optimize 0.1.3, probability 0.4.5. All 12
 packages now pass `vanic audit-safety` cleanly.
 
-**Why these are separate from the package-scope roadmap above**: MAINT-1/2/3/4 don't add
+**MAINT-5 done (2026-07-21)**: sourced from a direct user question ("what happens if a
+kosh-index package has the same function name as a vāṇी built-in — namespace or
+modules?"). Testing the answer surfaced a second, more serious bug: a project depending
+on two packages that each vendor their own copy of a shared dependency (`probability` +
+`optimize`, both vendoring `matrix`) failed to compile with "unknown function" errors
+for every matrix function — transitive dependencies were only resolved one level deep,
+and (unrelated to that) `probability` and `optimize` had drifted to different pinned
+`matrix` versions.
+
+Fixed as a full 6-phase arc in vani-compiler (see
+[`docs/kosh_namespacing_design.md`](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/kosh_namespacing_design.md)
+for the complete design + verification writeup):
+
+- **Phase 1** — real transitive dependency graph, deduplicated by `(name, version)` so a
+  diamond-shared package resolves to one compiled copy regardless of how many
+  dependents pull it in or how deeply it's vendored. Along the way, found and fixed two
+  latent bugs in `load_manifest`'s own unguarded recursion (crashed on a circular
+  `[deps]` reference) — see Phase 2.
+- **Phase 2** — package-level circular-dependency detection, reusing the same Tarjan SCC
+  algorithm that backs `vanic acyclicity`'s function-call-graph analysis.
+- **Phase 3** — automatic per-package namespacing: every `[deps]` package is compiled
+  inside its own `module <pkg_name> { ... }`, so its functions (and any exported struct
+  types) are referenced as `pkgname::item` — the actual fix for the original question.
+  A dependency defining `fn abs(...)` no longer collides with the vāṇी builtin `abs`,
+  or with any other package's `abs`, ever. Found and fixed a real parser gap along the
+  way (module bodies had no support for `#[attr]`-prefixed items, needed by every real
+  kosh package's `#[bounded_stack]`/`#[wcet]` annotations).
+- **Phase 4** — `vani.lock` now records the full resolved transitive graph, not just
+  direct `[deps]` entries.
+- **Phase 5** — migration UX: an unqualified call to a dependency function now gets a
+  "did you mean `pkgname::item`?" diagnostic instead of a bare unknown-function error.
+  Also fixed a real bug in `vanic add` itself: it wrote the raw registry package name as
+  the `[deps]` key verbatim, which broke for any hyphenated name (the real published
+  `hello-kosh` package, for instance) since a `[deps]` key must now be a valid
+  identifier. `vanic add` sanitizes automatically now.
+- **Phase 6** — migrated and republished all 8 affected packages (every one with
+  `[deps]`) to qualified call syntax: `vectorcalc` 0.1.3, `algebra` 0.1.3, `pde` 0.1.3,
+  `interval` 0.1.3, `tensor` 0.1.3, `signal` 0.1.3, `optimize` 0.1.4, `probability`
+  0.4.6. Fixed the `probability`/`optimize` `matrix` version drift (0.1.0 → 0.2.0,
+  confirmed purely additive via diff) as part of this pass.
+
+**Final verification**: a fresh project depending on the real, newly-published
+`probability` + `optimize` (the exact diamond that started this) compiles clean with
+zero version conflict, zero missing functions, zero namespace collision. All 12
+published kosh packages pass `vanic audit-safety` cleanly.
+
+**Why these are separate from the package-scope roadmap above**: MAINT-1 through MAINT-5 don't add
 new mathematical coverage — they're consistency/correctness upkeep on packages already
-shipped. All four are now done — every package-scope item AND every maintenance item
+shipped. All five are now done — every package-scope item AND every maintenance item
 in this document is shipped; only the optional symbolic tier remains anywhere in this
 roadmap.
