@@ -11,6 +11,9 @@ preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/enthusiasticgeek/kosh-index"
 edit-url-template = "https://github.com/enthusiasticgeek/kosh-index/edit/main/portal/{path}"
 no-section-label = false
+# Kosh Index logo -- introduction page banner styling. The
+# favicon needs no config: mdBook auto-detects theme/favicon.png.
+additional-css = ["theme/kosh.css"]
 
 [output.html.search]
 enable = true

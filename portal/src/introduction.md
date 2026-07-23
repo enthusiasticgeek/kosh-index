@@ -1,5 +1,7 @@
 # Kosh — vāṇī Package Registry
 
+<img class="kosh-logo" src="images/logo/kosh-index_logo.png" alt="Kosh Index logo"/>
+
 **Kosh** (कोश, *storehouse*) is the official package registry for the
 [vāṇī compiler](https://github.com/enthusiasticgeek/vani-compiler).
 
