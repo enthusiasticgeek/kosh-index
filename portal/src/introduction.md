@@ -40,12 +40,13 @@ automatically — you never need to type the URL yourself.
 
 ## Available packages
 
-Three packages are published today:
+15 packages are published today, spanning linear algebra
+(`matrix`, `sparse`, `tensor`), calculus (`calculus`, `vectorcalc`,
+`pde`), algebra (`algebra`, `interval`, `complex`), applied math
+(`probability`, `optimize`, `geometry`, `signal`, `discrete`), and a
+minimal example template (`hello-kosh`).
 
-| Package | Version | Description |
-|---|---|---|
-| [`calculus`](catalog.md#calculus) | 0.1.0 | Numerical calculus (integration, differentiation) |
-| [`probability`](catalog.md#probability) | 0.1.0 | Probability distributions and statistics |
-| [`hello-kosh`](catalog.md#hello-kosh) | 0.2.0 | Minimal example / getting-started template |
-
-Browse the full [Package Catalog](catalog.md).
+Browse the full [Package Catalog](catalog.md) for versions,
+dependencies, and checksums -- that page is the source of truth;
+this list intentionally isn't duplicated here so it can't drift out
+of sync the way it previously did.

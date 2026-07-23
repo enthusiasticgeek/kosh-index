@@ -339,6 +339,41 @@ discrete = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## interval
+
+**Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** none
+
+Rigorous interval arithmetic and first-order error propagation for
+the vāṇी compiler. Two distinct techniques share this package: interval
+arithmetic (`iv_*`), an `[lo, hi]` range provably containing the true
+value; and error propagation (`ep_*`), the linearized
+`σ_f ≈ sqrt(Σ(∂f/∂xi)²σxi²)` formula, which reuses `calculus`'s
+`diff_central` for the single-variable case.
+
+Includes core interval arithmetic (add/sub/mul/div/reciprocal/neg),
+interval elementary functions (sqrt/exp/log/integer-power/sin/cos),
+set operations (contains/width/midpoint/intersect/union-hull), and a
+multi-candidate interval-bisection root-finder (`iv_bisect_root`
+returns `Vec<Interval>`, not a single `Interval` -- a single-bracket
+version isn't actually rigorous once interval arithmetic's
+"dependency problem" is accounted for; see the package's own README).
+Error propagation covers single-variable, n-variable independent, and
+n-variable-with-covariance forms, plus closed-form shortcuts for
+sums/products/quotients.
+
+- **Repository:** [enthusiasticgeek/vani-interval](https://github.com/enthusiasticgeek/vani-interval)
+- **Checksum (0.1.0):** `f93ca7f2…f6f7ef36f`
+- **Checksum (0.1.1):** `e79dfac2…08d0b43f3`
+- **Checksum (0.1.2):** `1d004b40…2897cc227`
+- **Checksum (0.1.3):** `104ce8cf…16540ed92`
+
+```toml
+[deps]
+interval = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
