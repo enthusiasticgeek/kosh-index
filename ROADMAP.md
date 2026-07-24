@@ -210,9 +210,9 @@ the numeric tier above.
 
 | Repo | Depends on | Scope |
 |---|---|---|
-| **vani-bignum** | -- | Arbitrary-precision integers and rationals (digit-array + carry/borrow arithmetic in pure vāṇी, no compiler support needed). Numeric foundation everything else in this tier needs. |
-| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. |
-| **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. Could fold into vani-symbolic instead of being standalone. |
+| **vani-bignum** | -- | Arbitrary-precision integers and rationals (digit-array + carry/borrow arithmetic in pure vāṇी, no compiler support needed). Numeric foundation everything else in this tier needs. **v0.1.0 (integers only) built and locally verified 2026-07-24** — base-1e9 digit-array `BigInt`, construction/comparison/add/sub/mul/div/mod/gcd, full test suite passes both `--no-verify` and full-SMT `vanic check`. **Not yet published to kosh-index** (`vanic publish` not run — pending go-ahead). Rationals deferred to v0.2.0, matching this ecosystem's narrow-then-widen precedent. Surfaced one real compiler bug along the way: BUG-3, a `--backend=c`-only false-abort in a Vec-bounds optimizer hint (default LLVM backend unaffected), tracked in `vani-compiler/docs/TODO_CURRENT.md`. |
+| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. Not started. |
+| **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. Could fold into vani-symbolic instead of being standalone. Not started. |
 
 If the goal is SciPy/Eigen/Boost.Math-class coverage, the numeric tier above is the
 whole job. If the goal is closer to Mathematica/Maple/SageMath, the symbolic tier is
