@@ -292,6 +292,17 @@ repos too.
   `[deps]` entry). New packages don't need to add the vendor `use` line at all; see
   [MAINT-2](#maintenance--audit-findings-added-2026-07-21) below for the cleanup pass
   on already-shipped packages.
+- **vāṇी has no `#[derive(...)]`.** `Eq`, print/debug formatting, cloning, etc. are
+  never auto-generated -- every non-Copy struct that needs equality gets a hand-written
+  `implement Eq for T { fn eq(self: ref T, other: ref T) -> bool { ... } }` (Copy
+  structs can take `self: T, other: T` by value instead). `vani-bignum`'s `BigInt`
+  is the worked example (`implement Eq for BigInt` in `src/lib.vani`). This is a
+  deliberate language design choice, not a gap on the roadmap to fix -- budget the
+  boilerplate per struct rather than waiting for it to arrive. One real wrinkle:
+  `#[bounded_stack(...)]` on a method *inside* an `implement` block required
+  vani-compiler's BUG-4 fix (2026-07-24) to even parse; packages published before
+  that fix may still be using the `--allow-partial-safety-coverage` escape hatch for
+  their `Eq` impl and could drop it on their next republish.
 
 ---
 
