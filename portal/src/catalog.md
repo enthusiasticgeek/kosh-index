@@ -374,6 +374,35 @@ interval = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## bignum
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+
+Arbitrary-precision integer library for the vāṇी compiler -- numeric
+foundation for the planned symbolic-math tier. `BigInt` owns a `Vec<i64>`
+of base-1,000,000,000 (1e9) digit limbs (not Copy, unlike `complex`'s
+`Complex`), chosen because vāṇी has no integer type wider than `i64` and
+`+`/`-`/`*` trap on overflow rather than wrap.
+
+Includes construction/IO (from `i64`, from a decimal string, to a decimal
+string, to `i64`), sign/predicates, comparison (`bn_cmp` plus wrappers,
+and `implement Eq for BigInt` so `==`/`!=` work directly), arithmetic
+(add/sub/mul -- schoolbook multiply with immediate per-product carry
+propagation, the overflow-safety-critical design choice), truncating
+division/modulo (long division, binary-searching each quotient digit
+against the running remainder), and GCD (Euclidean algorithm). Integers
+only in v0.1.0 -- rational numbers are planned for v0.2.0.
+
+- **Repository:** [enthusiasticgeek/vani-bignum](https://github.com/enthusiasticgeek/vani-bignum)
+- **Checksum (0.1.0):** `5e6bb323…66b50f3e`
+
+```toml
+[deps]
+bignum = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
