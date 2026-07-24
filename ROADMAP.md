@@ -345,11 +345,12 @@ comments from earlier work, turning most of the job into verifying/correcting
 existing estimates rather than writing from scratch). ~230 functions got a real
 `vanic check`-exact `#[wcet(cycles=N)]`; the rest got a WCET formula comment
 (loop/recursion/fn-pointer-bearing, unbounded to the checker's WCET model).
-Two real compiler findings surfaced along the way (both tracked, neither fixed,
-in `vani-compiler/docs/TODO_CURRENT.md`): BUG-2 (the WCET estimator doesn't
-recurse into struct-literal field expressions, found on vani-complex) and the
-Big-O tool's nesting-depth heuristic disagreeing with correct algorithmic
-analysis on amortized bounds (found on vani-discrete's `disc_scc_kosaraju`).
+Two real compiler findings surfaced along the way, tracked in
+`vani-compiler/docs/TODO_CURRENT.md`: BUG-2 (the WCET estimator doesn't
+recurse into struct-literal field expressions, found on vani-complex) —
+✅ **fixed 2026-07-24** — and the Big-O tool's nesting-depth heuristic
+disagreeing with correct algorithmic analysis on amortized bounds (found on
+vani-discrete's `disc_scc_kosaraju`), which remains open.
 Every package verified via `vanic check` on every test file plus at least one
 full `vanic test` run per package before commit+publish. The original "large,
 multi-session" estimate held — this took the rest of the session across many
