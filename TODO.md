@@ -15,7 +15,7 @@ Full scope, architecture decision (arena representation, not recursive
 `Box<Self>`), and risk notes per phase are in ROADMAP.md's
 ["`vani-symbolic` scoping breakdown"](ROADMAP.md#vani-symbolic-scoping-breakdown-added-2026-07-24).
 
-- [x] ~~**vani-symbolic v0.1.0**~~ ✅ built 2026-07-25, **not yet published**
+- [x] ~~**vani-symbolic v0.1.0**~~ ✅ published 2026-07-25
       — arena (`Vec<ExprNode>` + `i64` child indices) + node-kind tags;
       construction (`sym_num`/`sym_var`/`sym_add`/`sym_sub`/`sym_mul`/
       `sym_div`/`sym_pow`/`sym_neg`, `symtab_intern`/`symtab_name_at`),
@@ -28,8 +28,10 @@ Full scope, architecture decision (arena representation, not recursive
       pass, no escape hatch needed. The naive recursive `Box<Self>`
       design was confirmed NOT to compile (two independent restrictions,
       documented in vani-compiler's new `docs/missing_features.md` entry)
-      before committing to the arena representation. Stopping before
-      `vanic publish` per this package's plan -- awaiting go-ahead.
+      before committing to the arena representation. Published to
+      kosh-index and verified via a fresh `vanic add symbolic` across
+      all four run/build × backend combinations (namespaced calls, e.g.
+      `symbolic::sym_add`, `symbolic::ExprNode`).
 - [ ] **vani-symbolic v0.2.0** — simplification: constant folding, identities,
       canonical commutative-operand ordering, like-term collection.
       **Highest-risk phase in the whole tier** — budget the most review time;

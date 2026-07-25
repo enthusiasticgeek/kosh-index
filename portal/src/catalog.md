@@ -403,6 +403,38 @@ bignum = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## symbolic
+
+**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+
+Symbolic-math (CAS) foundation for the vāṇी compiler -- expression
+construction, numeric evaluation, and precedence-aware printing. Phase 1
+of the planned symbolic tier; no simplification/differentiation/
+integration yet. `ExprNode` is a Copy struct (four `i64` fields) living
+in a flat `Vec<ExprNode>` arena with `i64` child indices instead of
+pointers, chosen because a recursive `Box<Self>` enum doesn't compile in
+vāṇी today (single-payload-field enum restriction plus no
+self-referential `box()` payloads).
+
+Includes construction (`sym_num`/`sym_var`/`sym_add`/`sym_sub`/`sym_mul`/
+`sym_div`/`sym_pow`/`sym_neg`, symbol-table interning), introspection
+(`sym_kind`/`sym_is_leaf`), numeric evaluation (`sym_eval`, nonnegative-
+integer `Pow` exponents only), a precedence-aware pretty-printer
+(`sym_to_str`, matching SymPy's `str()` spacing convention), and
+structural equality (`sym_eq_structural`, same-shape only -- not
+commutative). Construction/eval/print only in v0.1.0 -- simplification
+onward are planned as later versions.
+
+- **Repository:** [enthusiasticgeek/vani-symbolic](https://github.com/enthusiasticgeek/vani-symbolic)
+- **Checksum (0.1.0):** `a0e45f49…52e78ec58`
+
+```toml
+[deps]
+symbolic = { registry = "kosh", version = "^0.1" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
