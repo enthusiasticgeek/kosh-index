@@ -43,10 +43,10 @@ Not started.
 
 ## Maintenance
 
-- [ ] Drop `vani-bignum`'s `--allow-partial-safety-coverage` escape hatch on
-      its next republish — no longer needed now that vani-compiler's BUG-4
-      (`implement` blocks rejecting `#[attr]`-prefixed methods) is fixed.
-      Not urgent; do it opportunistically alongside any other bignum change.
+- [x] ~~Drop `vani-bignum`'s `--allow-partial-safety-coverage` escape hatch~~
+      ✅ done 2026-07-25 — republished as v0.1.1 with `#[bounded_stack(bytes
+      = 257)]` on `BigInt_eq`, `vanic audit-safety` reports full clean
+      coverage. Verified via AOT build (LLVM + C) in a fresh scratch project.
 - [ ] `ROADMAP.md` structural pass: the "Scientific computing (aggregate)"
       gap-analysis row is now redundant with the specific rows above it
       (signal/sparse/PDE all graduated into their own rows) — downgrade to a

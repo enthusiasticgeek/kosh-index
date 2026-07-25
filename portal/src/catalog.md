@@ -376,7 +376,7 @@ interval = { registry = "kosh", version = "^0.1" }
 
 ## bignum
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.1 &nbsp;|&nbsp; **Deps:** none
 
 Arbitrary-precision integer library for the vāṇी compiler -- numeric
 foundation for the planned symbolic-math tier. `BigInt` owns a `Vec<i64>`
@@ -394,7 +394,7 @@ against the running remainder), and GCD (Euclidean algorithm). Integers
 only in v0.1.0 -- rational numbers are planned for v0.2.0.
 
 - **Repository:** [enthusiasticgeek/vani-bignum](https://github.com/enthusiasticgeek/vani-bignum)
-- **Checksum (0.1.0):** `5e6bb323…66b50f3e`
+- **Checksum (0.1.1):** `d09d3700…7c0deb8e`
 
 ```toml
 [deps]
