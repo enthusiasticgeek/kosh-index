@@ -14,12 +14,22 @@ distilled: 2026-07-25.
 Full scope, architecture decision (arena representation, not recursive
 `Box<Self>`), and risk notes per phase are in ROADMAP.md's
 ["`vani-symbolic` scoping breakdown"](ROADMAP.md#vani-symbolic-scoping-breakdown-added-2026-07-24).
-Not started.
 
-- [ ] **vani-symbolic v0.1.0** — arena (`Vec<Node>` + `i64` child indices) +
-      node-kind tags; builder functions (`sym_num`/`sym_var`/`sym_add`/...);
-      `sym_eval` (numeric substitution); `sym_to_str` (precedence-aware
-      printer); `sym_eq_structural`. Depends on: vani-bignum (published).
+- [x] ~~**vani-symbolic v0.1.0**~~ ✅ built 2026-07-25, **not yet published**
+      — arena (`Vec<ExprNode>` + `i64` child indices) + node-kind tags;
+      construction (`sym_num`/`sym_var`/`sym_add`/`sym_sub`/`sym_mul`/
+      `sym_div`/`sym_pow`/`sym_neg`, `symtab_intern`/`symtab_name_at`),
+      introspection (`sym_kind`/`sym_is_leaf`), `sym_eval` (numeric
+      substitution, nonnegative-integer `Pow` only), `sym_to_str`
+      (precedence-aware printer, a genuinely new pattern in this
+      ecosystem), `sym_eq_structural` (same-shape only). Full test suite
+      + composed example verified byte-identical on both backends with
+      full SMT `vanic check`; `vanic audit-safety` clean on the first
+      pass, no escape hatch needed. The naive recursive `Box<Self>`
+      design was confirmed NOT to compile (two independent restrictions,
+      documented in vani-compiler's new `docs/missing_features.md` entry)
+      before committing to the arena representation. Stopping before
+      `vanic publish` per this package's plan -- awaiting go-ahead.
 - [ ] **vani-symbolic v0.2.0** — simplification: constant folding, identities,
       canonical commutative-operand ordering, like-term collection.
       **Highest-risk phase in the whole tier** — budget the most review time;
@@ -38,6 +48,40 @@ Not started.
       theorem + synthetic division), folding in what would have been a
       separate `vani-polyalgebra` repo. Gröbner bases stay out of scope
       unless a real use case shows up.
+
+---
+
+## ML tier (optional — confirm before starting each phase)
+
+Full scope, the closures/lifetime-variable question (resolved: no compiler
+prerequisite, use the same arena pattern as vani-symbolic), and risk notes
+per phase are in ROADMAP.md's
+["`vani-ml` scoping breakdown"](ROADMAP.md#vani-ml-scoping-breakdown).
+Repo scaffolded 2026-07-25 (`vani.toml` + doc skeleton only). Not started.
+
+- [ ] **vani-ml v0.1.0** — classical ML: linear regression (wraps
+      vani-probability's MLR), logistic regression (cross-entropy loss +
+      vani-optimize's gradient descent), k-means clustering, train/test
+      split, core metrics (accuracy, MSE, precision/recall). Depends on:
+      vani-probability, vani-optimize (both published).
+- [ ] **vani-ml v0.2.0** — data utilities: feature scaling, one-hot
+      encoding, a `Dataset` struct (row-major, matches vani-matrix/
+      vani-tensor convention), k-fold cross-validation.
+- [ ] **vani-ml v0.3.0** — autodiff core: flat arena (`Vec<Node>` + `i64`
+      child indices, same pattern as vani-symbolic), forward eval,
+      reverse-mode backward pass via explicit `mut ref Vec<f64>` gradient
+      buffers (not ref-capturing closures — those are compiler path-D,
+      deferred indefinitely, see ROADMAP.md). **Highest-risk phase in this
+      tier** — validate via finite-difference gradient checking against
+      every node kind, not hand-picked examples.
+- [ ] **vani-ml v0.4.0** — dense/linear layer, activations (relu/sigmoid/
+      tanh/softmax), losses (MSE, cross-entropy) as graph node kinds.
+- [ ] **vani-ml v0.5.0** — optimizers over the graph's parameter vector:
+      SGD, momentum, Adam. New code (vani-optimize's solvers don't fit
+      this signature), same underlying math.
+- [ ] **vani-ml v0.6.0+** (optional/stretch) — training-loop utilities,
+      batching, worked small-MLP examples. Revisit scope once the core
+      phases are shipped and actually used.
 
 ---
 

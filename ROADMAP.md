@@ -2,20 +2,22 @@
 
 This tracks which **packages** should exist to give vāṇी broad mathematical library
 coverage — comparable to SciPy / Eigen / Armadillo / Boost.Math for the numeric tier,
-with an optional, much larger symbolic tier on top. `catalog.md` lists what's actually
-published right now; this file is the forward-looking plan.
+with an optional, much larger symbolic tier on top, plus an ML tier built on both.
+`catalog.md` lists what's actually published right now; this file is the
+forward-looking plan.
 
 Compiler-level items that this roadmap depends on (if any) are tracked in
 [vani-compiler's docs/TODO_CURRENT.md](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/TODO_CURRENT.md)
 under "Kosh math-library ecosystem" and cross-linked from here.
 
-Last updated: 2026-07-21
+Last updated: 2026-07-25
 
 **Status: the numeric/scientific tier (all 12 packages below) is complete,
 every row in the gap-analysis table below is ✅, and every itemized gap
 within those rows (G1-G7, N1-N2, and now N3) is shipped.** What remains
-is only the optional, much larger symbolic tier — see "Planned: symbolic
-tier" below.
+is the optional symbolic tier — see "Planned: symbolic tier" below — and
+the newly-scoped ML tier — see "Planned: ML tier" below, repo scaffolded
+2026-07-25, no functions implemented yet.
 
 ---
 
@@ -209,7 +211,7 @@ the numeric tier above.
 | Repo | Depends on | Scope |
 |---|---|---|
 | ~~**vani-bignum**~~ ✅ v0.1.1 published 2026-07-25 | -- | Arbitrary-precision integers (rationals deferred to v0.2.0, matching this ecosystem's narrow-then-widen precedent). Numeric foundation everything else in this tier needs. Base-1e9 digit-array `BigInt`, construction/comparison/add/sub/mul/div/mod/gcd (22 functions), full test suite passes both `--no-verify` and full-SMT `vanic check`. Published to kosh-index and verified via a fresh `vanic add bignum` in a scratch project (namespaced calls, e.g. `bignum::bn_add`, per the MAINT-5 per-package-namespacing rule). Surfaced two real compiler bugs along the way, both tracked in `vani-compiler/docs/TODO_CURRENT.md` and **both ✅ fixed 2026-07-24**: BUG-3 (a `--backend=c`-only false-abort in a Vec-bounds optimizer hint) and BUG-4 (`implement` blocks reject `#[attr]`-prefixed methods). **v0.1.1 (2026-07-25)** dropped the `--allow-partial-safety-coverage` escape hatch v0.1.0 needed for `BigInt_eq` -- `#[bounded_stack(bytes=257)]` added now that BUG-4 is fixed, `vanic audit-safety` reports full clean coverage. Re-verified end-to-end via AOT build on both backends (LLVM JIT/`vanic run` currently hits an unrelated, separately-tracked Windows JIT symbol-resolution issue in `mingw_ansi_stdio_shared_lib`, being worked on in a parallel session -- AOT is unaffected). |
-| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. **Not started; scoped below (2026-07-24).** |
+| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. **v0.1.0 (construction/eval/print) built 2026-07-25, not yet published** — see the scoping breakdown below for the full phased plan; v0.2.0+ not started. |
 | **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. **Decision: fold into `vani-symbolic` as a later phase rather than a standalone repo** (see below) -- no separate repo planned. |
 
 If the goal is SciPy/Eigen/Boost.Math-class coverage, the numeric tier above is the
@@ -280,6 +282,76 @@ this is a scoping breakdown, not a start signal.
 
 ---
 
+## Planned: ML tier (scoped 2026-07-25)
+
+A third tier, distinct from both the numeric and symbolic tiers above --
+not a numeric-tier gap-fill row and not CAS. `vani-ml` repo scaffolded
+2026-07-25 (`vani.toml` + doc skeleton only, no functions implemented).
+
+**Deliberately staged in one repo, not split across repos** -- consistent
+with how this ecosystem draws repo boundaries by *domain*, not by
+architectural layer (e.g. `vani-tensor` is a separate repo from
+`vani-matrix` because N-D arrays are a different domain from dense 2D
+linear algebra, not because of a "storage layer vs. algorithm layer"
+split). Classical ML and an autodiff/NN engine are one domain (machine
+learning) at two capability levels, matching how `vani-symbolic` stages
+construction → simplification → differentiation as versions within a
+single repo rather than as separate repos.
+
+| Repo | Depends on | Scope |
+|---|---|---|
+| **vani-ml** | vani-probability, vani-optimize (v0.1.0); vani-matrix, vani-tensor (v0.3.0+) | Classical ML (regression, clustering, metrics) staged first; autodiff + neural-net engine staged on top. **Not started; scoped below (2026-07-25).** |
+
+### Compiler-feature question resolved before scoping (2026-07-25)
+
+An autodiff engine needs *something* like a differentiable computation
+graph. The naive design -- closures that capture a mutable gradient
+buffer by reference -- **does not compile in vāṇी today**: closures with
+move/Copy captures and full `FnOnce` semantics for non-Copy captures
+shipped 2026-07-15, but *ref-capturing* closures are explicitly out of
+scope, filed under `docs/missing_features.md`'s "Lifetime variables"
+entry as **path-D, deferred indefinitely** -- blocked on multi-parameter
+lifetime variables, which the compiler's own `docs/decisions.md`
+(2026-06-09) already declined to build ("adding explicit lifetime
+variables for the rare N-ref case would add syntax complexity
+disproportionate to its use"). There is no existing scope estimate for
+path-D anywhere in the compiler docs, because it was sized for rejection,
+not implementation; a real implementation would mean lifetime-parameter
+syntax, propagation through fn signatures *and* struct defs, multi-lifetime
+borrow-check rules, and closure-env lifetime tracking -- multiple weeks
+minimum, with real risk of interaction with SIMD/safety-attribute/SMT
+machinery already in the checker, for a payoff (ref-captured closures)
+this project doesn't actually need.
+
+**Decision: no compiler prerequisite.** The autodiff graph uses the same
+flat-arena pattern `vani-symbolic` already uses for its expression tree
+(`Vec<Node>` + `i64` child indices) -- refs are passed as explicit
+`ref`/`mut ref` fn arguments (e.g. a `mut ref Vec<f64>` gradient-accumulator
+buffer threaded through every backward-pass call), never captured. This is
+a proven pattern, not a workaround invented for this package: three
+existing/planned packages (`vani-vectorcalc`, `vani-symbolic`, now
+`vani-ml`) already route around the no-ref-capture gap the same way.
+Copy-only closures (already shipped) remain fine for elementwise ops with
+no gradient tracking, e.g. an activation function applied via `vec_map`.
+
+### `vani-ml` scoping breakdown
+
+| Phase | Scope | Depends on | Risk / notes |
+|---|---|---|---|
+| v0.1.0 | Classical ML: linear regression (thin wrapper over `vani-probability`'s existing MLR), logistic regression (cross-entropy loss + `vani-optimize`'s gradient descent), k-means clustering, train/test split, core metrics (accuracy, MSE, precision/recall). | vani-probability, vani-optimize | Low. Mostly glue over existing packages -- k-means and the metrics module are the only genuinely new code, same shape as every other package's "construction + IO" opening phase. |
+| v0.2.0 | Data utilities: feature scaling (standardize/normalize), one-hot encoding, a `Dataset` struct (row-major `Vec<f64>` features + labels, matching `vani-matrix`/`vani-tensor`'s row-major convention), k-fold cross-validation. | v0.1.0 | Low. New but small and mechanical. |
+| v0.3.0 | Autodiff core: flat arena (`Vec<Node>` + `i64` child indices, node-kind tags -- direct reuse of `vani-symbolic`'s pattern, see above), forward evaluation, reverse-mode backward pass accumulating into a `mut ref Vec<f64>` gradient buffer passed explicitly through every call (no ref-capturing closures, per the resolved question above). | v0.2.0, vani-tensor (value storage) | **Highest risk phase in this tier**, same designation as `vani-symbolic`'s v0.2.0 for the same reason: a wrong gradient rule silently poisons everything built on top. Primary correctness gate should be finite-difference gradient checking against every node kind (numeric gradient ≈ autodiff gradient within tolerance), not hand-picked examples alone. |
+| v0.4.0 | Dense/linear layer (matmul + bias via `vani-matrix`/`vani-tensor`), activations (relu/sigmoid/tanh/softmax) and losses (MSE, cross-entropy) as graph node kinds. | v0.3.0 | Medium. Built directly on the graph; validate each new node kind with the same finite-difference check as v0.3.0. |
+| v0.5.0 | Optimizers over the graph's parameter vector: SGD, momentum, Adam. | v0.3.0 | Medium. `vani-optimize`'s existing solvers don't fit this signature (per-graph gradient vector, not a `fn(ref Vec<f64>) -> f64` objective) -- new code, same underlying math, not a straight reuse. |
+| v0.6.0+ (optional/stretch) | Training-loop utilities, batching, a couple of worked small-MLP examples end-to-end. | v0.1.0-v0.5.0 | Open-ended; revisit once the core phases are shipped and actually used -- same "fold in if a real use case shows up" caveat as `vani-symbolic`'s v0.6.0+. |
+
+**Recommended order**: v0.1.0 → v0.2.0 → v0.3.0 (budget the most review
+time here, it's the risk concentration point) → v0.4.0 → v0.5.0 → v0.6.0+
+(optional/stretch). **Confirm before starting each phase**, same rule as
+the symbolic tier -- this is a scoping breakdown, not a start signal.
+
+---
+
 ## Effort estimates
 
 Calibrated against what's actually happened building the published packages --
@@ -295,7 +367,8 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
 | **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
 | **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0, vani-interval | ~8-28 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), a stiff-system stability demonstration (calculus v0.3.0), and a rigorous-vs-linearized cross-check on the same problem plus a deliberate interval-arithmetic "dependency problem" test case (interval) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
-| **CAS tier** | ✅ vani-bignum; vani-symbolic phased v0.1.0-v0.6.0+ scoped 2026-07-24, not started; vani-polyalgebra folded into vani-symbolic v0.6.0+, no separate repo | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale. See the [`vani-symbolic` scoping breakdown](#vani-symbolic-scoping-breakdown-added-2026-07-24) above for the phase-by-phase risk profile. | Not comparable to the above; expect several units minimum through v0.3.0 alone, more for v0.4.0+; treat "done" as aspirational |
+| **CAS tier** | ✅ vani-bignum; vani-symbolic v0.1.0 built 2026-07-25 (not yet published), v0.2.0+ not started; vani-polyalgebra folded into vani-symbolic v0.6.0+, no separate repo | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale. See the [`vani-symbolic` scoping breakdown](#vani-symbolic-scoping-breakdown-added-2026-07-24) above for the phase-by-phase risk profile. | v0.1.0 took ~1 unit, in line with a "New numeric repo" despite being a different problem class -- construction/eval/print alone didn't hit the open-ended CAS risk yet; that starts at v0.2.0. Not comparable beyond that; expect several units minimum through v0.3.0, more for v0.4.0+; treat "done" as aspirational |
+| **ML tier** | vani-ml phased v0.1.0-v0.6.0+ scoped 2026-07-25, repo scaffolded, not started | v0.1.0-v0.2.0 (classical ML + data utilities) are glue-shaped, close to the "New numeric repos" row above. v0.3.0 (autodiff core) is a new-architecture phase comparable in risk profile to `vani-symbolic`'s v0.2.0 -- a wrong gradient rule silently poisons every layer built on it. See the [`vani-ml` scoping breakdown](#vani-ml-scoping-breakdown) above. | ~1 unit for v0.1.0-v0.2.0 combined; v0.3.0 alone comparable to a "Bigger numeric repo" (~1.5-2 units) given it's a new representation, not a reuse; v0.4.0-v0.5.0 ~1 unit each once v0.3.0 is solid |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
 each published package so far was validation, compiler-bug archaeology, and doc/registry
@@ -314,7 +387,8 @@ repos too.
 6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- completed the original 8-item ordered sequence.
 7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" and "Calculus — vector" gap-analysis rows, requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
 8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7), ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2), and ~~**vani-interval**~~ ✅ shipped 2026-07-21 (N3) -- itemized follow-up gaps under the "mostly done" rows, each requested separately after step 7. Every itemized gap in this document is now shipped.
-9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted. ~~**vani-bignum**~~ ✅ shipped 2026-07-24 -- the exact-arithmetic foundation. **vani-symbolic** phased breakdown (v0.1.0 construction/print/eval → v0.2.0 simplification → v0.3.0 differentiation → v0.5.0 equation solving → v0.4.0 integration → v0.6.0+ polynomial factorization, folding in what would've been vani-polyalgebra) scoped 2026-07-24, see [above](#vani-symbolic-scoping-breakdown-added-2026-07-24). **Optional; confirm before starting each phase.** This is the only work left anywhere in this document.
+9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted. ~~**vani-bignum**~~ ✅ shipped 2026-07-24 -- the exact-arithmetic foundation. **vani-symbolic** phased breakdown (v0.1.0 construction/print/eval → v0.2.0 simplification → v0.3.0 differentiation → v0.5.0 equation solving → v0.4.0 integration → v0.6.0+ polynomial factorization, folding in what would've been vani-polyalgebra) scoped 2026-07-24, see [above](#vani-symbolic-scoping-breakdown-added-2026-07-24). **Optional; confirm before starting each phase.**
+10. ML tier, independent of the symbolic tier (depends only on the numeric tier, which is done). **vani-ml** phased breakdown (v0.1.0 classical ML → v0.2.0 data utilities → v0.3.0 autodiff core → v0.4.0 layers/activations/losses → v0.5.0 optimizers → v0.6.0+ training-loop utilities/stretch) scoped 2026-07-25, repo scaffolded, see [above](#planned-ml-tier-scoped-2026-07-25). **Optional; confirm before starting each phase.** This and the symbolic tier are the only work left anywhere in this document.
 
 ---
 
