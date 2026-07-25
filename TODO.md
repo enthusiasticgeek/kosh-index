@@ -47,10 +47,11 @@ Not started.
       ✅ done 2026-07-25 — republished as v0.1.1 with `#[bounded_stack(bytes
       = 257)]` on `BigInt_eq`, `vanic audit-safety` reports full clean
       coverage. Verified via AOT build (LLVM + C) in a fresh scratch project.
-- [ ] `ROADMAP.md` structural pass: the "Scientific computing (aggregate)"
-      gap-analysis row is now redundant with the specific rows above it
-      (signal/sparse/PDE all graduated into their own rows) — downgrade to a
-      footnote or remove outright.
+- [x] ~~`ROADMAP.md` structural pass: remove the redundant "Scientific
+      computing (aggregate)" gap-analysis row~~ ✅ done 2026-07-25 — removed
+      the row and its footnote, renumbered the remaining two ("Known gaps"
+      section is now ¹² instead of ¹²³), left a one-line note explaining
+      the removal in place.
 
 ---
 

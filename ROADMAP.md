@@ -85,9 +85,14 @@ work; 🟡 is partially covered by an existing package; ❌ needs a new repo.
 | Geometry (computational + analytic) | ✅ done (v0.1.0) | vani-geometry |
 | Fourier/signal processing (FFT/DFT/Laplace/Z) | ✅ done (v0.1.0) | vani-signal |
 | Tensor math (N-D beyond matrices) | ✅ done (v0.1.0) | vani-tensor |
-| Scientific computing (aggregate) | ✅ substantially covered³ | vani-matrix + vani-calculus + vani-probability |
 
-### ¹²³ Known gaps within "mostly done" / "substantially covered" rows
+*(A "Scientific computing (aggregate)" rollup row previously lived here;
+removed 2026-07-25 as redundant with the specific rows above it -- signal
+processing, sparse matrices, and PDEs had all already graduated into their
+own rows, leaving it a summary of summaries with no gaps of its own to
+track.)*
+
+### ¹² Known gaps within "mostly done" rows
 
 Three rows above are marked done with a qualifier rather than a plain ✅ —
 this section spells out exactly what's still missing under each, as a
@@ -142,13 +147,6 @@ more commonly needed). Shipped as one package, `vani-interval`. Itemized:
 | N3.4 | ~~Rigorous interval-bisection root-finding~~ ✅ `iv_bisect_root` | unlike vani-calculus's point-sample `bisect`, provably doesn't miss a root inside the starting bracket -- returns `Vec<Interval>` (every surviving candidate), not a single `Interval`, since a single-bracket version turns out not to be rigorous once interval arithmetic's "dependency problem" is accounted for; see vani-interval's README |
 | N3.5 | ~~First-order error propagation: single-var, n-var independent, n-var with covariance~~ ✅ `ep_propagate_1var`/`ep_propagate_independent`/`ep_propagate_covariance` | n-var forms reuse vani-optimize's `fn(ref Vec<f64>, i64)->f64` multivariate convention via a small private helper, not vani-calculus's `gradient_1d`/`jacobian_1d` as originally sketched here -- those turned out to be single-var-sampled-at-multiple-points, not multivariate partials, so they didn't actually fit |
 | N3.6 | ~~Closed-form propagation shortcuts (sum/product/quotient)~~ ✅ `ep_sum2`/`ep_sum_n`/`ep_product2`/`ep_quotient2` | the textbook `σ_f=sqrt(σx²+σy²)` (sum) and relative-error-in-quadrature (product/quotient) forms, worth having directly rather than always going through N3.5's general path |
-
-**³ Scientific computing (aggregate)** — this row is a rollup, not a
-concrete deliverable, and is now largely redundant with the specific rows
-above it (signal processing, sparse matrices, and PDEs all graduated into
-their own rows already). No new tracked items here; candidate for
-downgrading to a footnote or removing outright next time this file gets a
-structural pass, rather than a source of real gaps.
 
 #### Where did G1-G7 / N1-N3 land?
 
