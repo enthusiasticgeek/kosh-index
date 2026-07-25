@@ -210,14 +210,75 @@ the numeric tier above.
 
 | Repo | Depends on | Scope |
 |---|---|---|
-| ~~**vani-bignum**~~ ✅ v0.1.0 published 2026-07-24 | -- | Arbitrary-precision integers (rationals deferred to v0.2.0, matching this ecosystem's narrow-then-widen precedent). Numeric foundation everything else in this tier needs. Base-1e9 digit-array `BigInt`, construction/comparison/add/sub/mul/div/mod/gcd (22 functions), full test suite passes both `--no-verify` and full-SMT `vanic check`. Published to kosh-index and verified via a fresh `vanic add bignum` in a scratch project (namespaced calls, e.g. `bignum::bn_add`, per the MAINT-5 per-package-namespacing rule). Surfaced two real compiler bugs along the way, both tracked in `vani-compiler/docs/TODO_CURRENT.md`, neither fixed: BUG-3 (a `--backend=c`-only false-abort in a Vec-bounds optimizer hint; default LLVM backend unaffected) and BUG-4 (`implement` blocks reject `#[attr]`-prefixed methods entirely, unlike `module` blocks -- published with `--allow-partial-safety-coverage` for the one affected function, `BigInt_eq`). |
-| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. Not started. |
-| **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. Could fold into vani-symbolic instead of being standalone. Not started. |
+| ~~**vani-bignum**~~ ✅ v0.1.0 published 2026-07-24 | -- | Arbitrary-precision integers (rationals deferred to v0.2.0, matching this ecosystem's narrow-then-widen precedent). Numeric foundation everything else in this tier needs. Base-1e9 digit-array `BigInt`, construction/comparison/add/sub/mul/div/mod/gcd (22 functions), full test suite passes both `--no-verify` and full-SMT `vanic check`. Published to kosh-index and verified via a fresh `vanic add bignum` in a scratch project (namespaced calls, e.g. `bignum::bn_add`, per the MAINT-5 per-package-namespacing rule). Surfaced two real compiler bugs along the way, both tracked in `vani-compiler/docs/TODO_CURRENT.md`: BUG-3 (a `--backend=c`-only false-abort in a Vec-bounds optimizer hint) and BUG-4 (`implement` blocks reject `#[attr]`-prefixed methods) -- **both ✅ fixed 2026-07-24**, see the [entries there](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/TODO_CURRENT.md). `vani-bignum` still carries the `--allow-partial-safety-coverage` escape hatch it needed before the BUG-4 fix; dropping it on a future republish is a candidate MAINT item, not urgent. |
+| **vani-symbolic** | vani-bignum | Expression trees, simplification rules, symbolic differentiation/integration, equation solving. **Not started; scoped below (2026-07-24).** |
+| **vani-polyalgebra** | vani-bignum, vani-symbolic | Polynomial factorization, Gröbner bases. **Decision: fold into `vani-symbolic` as a later phase rather than a standalone repo** (see below) -- no separate repo planned. |
 
 If the goal is SciPy/Eigen/Boost.Math-class coverage, the numeric tier above is the
 whole job. If the goal is closer to Mathematica/Maple/SageMath, the symbolic tier is
 required on top -- and is a fundamentally larger undertaking than everything else in
 this document combined.
+
+### `vani-symbolic` scoping breakdown (added 2026-07-24)
+
+**Architecture decision: flat arena, not a recursive `Box<Self>` tree.**
+The obvious design -- `enum Expr { Num(i64), Add(Box<Expr>, Box<Expr>), ... }`,
+the standard shape in Rust/Lisp-family CAS toy implementations -- **does not
+compile in vāṇी today**, confirmed by direct test while scoping this package.
+Two independent compiler restrictions each block it on their own: enum
+variants admit only a single payload field in v1 (so a two-child variant is
+rejected outright), and `box()`'s admitted payload types don't include a
+type that (transitively) contains itself. Full writeup, including the exact
+repro and error messages, filed as a new entry in vani-compiler's
+[`docs/missing_features.md`](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/missing_features.md)
+("Recursive / self-referential types"). This is a real, previously-undocumented
+gap -- not something to wait on fixing before starting; the workaround is
+solid and arguably a better fit for this ecosystem anyway:
+
+Represent every expression tree as a `Vec<Node>` arena with `i64` child
+indices (`-1` = none) instead of pointers -- the same "flat `Vec` + explicit
+index" convention already used by `vani-tensor` (shape encoding),
+`vani-discrete` (adjacency matrix), and `vani-sparse` (COO/CSR). Confirmed
+working end-to-end (both backends, `vanic check`) with a minimal
+`struct Node { kind: i64, value: i64, left: i64, right: i64 }` arena and a
+recursive `eval(arena: ref Vec<Node>, idx: i64) -> i64` walker before writing
+this breakdown. `kind` is a small integer tag (0=Num, 1=Var, 2=Add, 3=Sub,
+4=Mul, 5=Div, 6=Pow, 7=Neg, plus one per elementary function needed later);
+node payloads that don't fit in two `i64` fields (variable names, `BigInt`
+coefficients) live in side tables (`Vec<OwnedStr>` for names, a parallel
+arena for `BigInt` limbs) indexed the same way.
+
+**Numeric layer**: v0.1.0 uses plain `i64` coefficients, not `BigInt` --
+matches this ecosystem's narrow-then-widen precedent (`vani-algebra` shipped
+real-roots-only, `vani-discrete` shipped counting-only). Switch `Num` nodes
+to reference `vani-bignum`'s `BigInt` once exact-arithmetic overflow actually
+becomes a problem in practice, and defer symbolic *rational* coefficients
+entirely until `vani-bignum` ships `Rational` (its own documented v0.2.0).
+
+**Phased breakdown** (version numbers are proposed, not committed):
+
+| Phase | Scope | Depends on | Risk / notes |
+|---|---|---|---|
+| v0.1.0 | Arena + node-kind tags; builder functions (`sym_num`, `sym_var`, `sym_add`, `sym_mul`, ...) returning node indices; `sym_eval` (numeric substitution given `var_id`→value pairs); `sym_to_str` (precedence-aware pretty-printer); `sym_eq_structural` (same-shape equality, not semantic equality). | -- | Low. Same shape as every other package's "construction + IO" opening phase. |
+| v0.2.0 | Simplification: constant folding, identities (`x+0`, `x*1`, `x*0`, `x-x`), canonical ordering of commutative `Add`/`Mul` operands (needed before "collect like terms" is even well-defined), like-term collection. | v0.1.0 | **Highest risk phase in the whole tier.** A wrong rule silently poisons every later phase built on top of it. Primary correctness gate should be property-based, not example-based: `simplify(e)` evaluated (via `sym_eval`) at several sample points must equal `e` evaluated at the same points, for many randomly-generated small expressions -- not just a handful of hand-picked cases. Rules that aren't generically valid (e.g. `x/x → 1` assumes `x ≠ 0`) need an explicit, documented policy on whether this tier assumes generic nonzero variables (the common CAS convention) or refuses to fire such rules at all. |
+| v0.3.0 | Symbolic differentiation (`sym_diff`): sum/product/quotient/chain/power rules, building new arena nodes. | v0.2.0 (raw differentiation output needs the simplifier to stay readable) | Medium. Validate via cross-check against `vani-calculus`'s `diff_central` (symbolic derivative evaluated at a point ≈ numeric derivative at the same point, within tolerance) -- a genuine cross-package composed check, matching this ecosystem's established validation discipline. |
+| v0.4.0 | Basic symbolic integration: a **fixed pattern table** (term-by-term polynomial power rule, elementary `exp`/`ln`/`sin`/`cos` antiderivatives, a small set of recognized `u`-substitution shapes) that returns an explicit "no rule matched" result rather than guessing. **Not** a general algorithm (no Risch) -- that stays out of scope indefinitely, consistent with this roadmap's existing "aspirational" framing for the CAS tier. | v0.3.0 (validation reuses differentiation) | High. Validate every rule that fires via the fundamental theorem: `sym_diff(result) == original` (post-simplification structural or evaluated-at-sample-points equality). |
+| v0.5.0 | Simple equation solving: linear (`ax+b=0`) directly; quadratic by reusing `vani-algebra`'s existing closed-form solver rather than reimplementing it. General polynomial/system solving explicitly deferred. | v0.2.0, `vani-algebra` | Low -- thin layer, most of the hard work is already done in `vani-algebra`. |
+| v0.6.0+ | `vani-polyalgebra`'s scope folded in here: polynomial factorization (rational-root theorem + synthetic division, mirroring `vani-algebra`'s existing "closed-form + numeric fallback, real roots only" precedent). Gröbner bases stay out of scope unless a real use case shows up -- already flagged as research-tier math elsewhere in this document. | v0.1.0-v0.5.0 | Open-ended; revisit scope once the core phases are shipped and actually used. |
+
+**Explicitly out of scope, all phases**: general integration (Risch
+algorithm); symbolic linear algebra (matrices of symbolic expressions --
+would need `vani-matrix`'s whole `Vec<f64>` convention rethought for a
+`Vec<Expr>`-arena-index type, a different and harder problem, not a small
+extension); multivariable symbolic calculus beyond partial derivatives.
+
+**Recommended order**: v0.1.0 → v0.2.0 (budget the most review time here,
+it's the risk concentration point) → v0.3.0 → v0.5.0 (cheap, reuses
+`vani-algebra`, can jump ahead of v0.4.0 if integration stalls) → v0.4.0
+(optional/stretch) → v0.6.0+ (`vani-polyalgebra` scope, only if still
+wanted once the core is solid). Still gated on the same **confirm before
+starting** rule the roadmap already applies to the whole symbolic tier --
+this is a scoping breakdown, not a start signal.
 
 ---
 
@@ -236,7 +297,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **Bigger numeric repos** | ✅ vani-tensor, vani-pde | Wider design surface (N-D indexing scheme; PDE needs a discretization strategy decision up front) | ~1.5–2 units each |
 | **Smaller-than-expected numeric repo** | ✅ vani-algebra | Estimated ~15-20 functions, shipped at 11 -- scope was deliberately narrowed (real roots only, no hand-derived Ferrari's-method quartic) rather than forcing a riskier implementation to hit the estimate | ~0.75 unit |
 | **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0, vani-interval | ~8-28 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), a stiff-system stability demonstration (calculus v0.3.0), and a rigorous-vs-linearized cross-check on the same problem plus a deliberate interval-arithmetic "dependency problem" test case (interval) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
-| **CAS tier** | vani-bignum, vani-symbolic, vani-polyalgebra (not started; optional) | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale | Not comparable to the above; expect several units minimum for a minimal symbolic core, and treat "done" as aspirational |
+| **CAS tier** | ✅ vani-bignum; vani-symbolic phased v0.1.0-v0.6.0+ scoped 2026-07-24, not started; vani-polyalgebra folded into vani-symbolic v0.6.0+, no separate repo | Open-ended -- correctness bugs are subtle and compound (a wrong simplification rule silently poisons everything built on it); real CAS projects are multi-year efforts even at small scale. See the [`vani-symbolic` scoping breakdown](#vani-symbolic-scoping-breakdown-added-2026-07-24) above for the phase-by-phase risk profile. | Not comparable to the above; expect several units minimum through v0.3.0 alone, more for v0.4.0+; treat "done" as aspirational |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
 each published package so far was validation, compiler-bug archaeology, and doc/registry
@@ -255,7 +316,7 @@ repos too.
 6. ~~**vani-algebra**~~ ✅ shipped 2026-07-20 -- completed the original 8-item ordered sequence.
 7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" and "Calculus — vector" gap-analysis rows, requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
 8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7), ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2), and ~~**vani-interval**~~ ✅ shipped 2026-07-21 (N3) -- itemized follow-up gaps under the "mostly done" rows, each requested separately after step 7. Every itemized gap in this document is now shipped.
-9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted -- start with **vani-bignum**, since vani-symbolic can't do much without exact arithmetic underneath it. **Optional; confirm before starting.** This is the only work left anywhere in this document.
+9. Symbolic tier only if full Mathematica/SageMath-class capability is actually wanted. ~~**vani-bignum**~~ ✅ shipped 2026-07-24 -- the exact-arithmetic foundation. **vani-symbolic** phased breakdown (v0.1.0 construction/print/eval → v0.2.0 simplification → v0.3.0 differentiation → v0.5.0 equation solving → v0.4.0 integration → v0.6.0+ polynomial factorization, folding in what would've been vani-polyalgebra) scoped 2026-07-24, see [above](#vani-symbolic-scoping-breakdown-added-2026-07-24). **Optional; confirm before starting each phase.** This is the only work left anywhere in this document.
 
 ---
 
