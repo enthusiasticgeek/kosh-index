@@ -32,11 +32,28 @@ Full scope, architecture decision (arena representation, not recursive
       kosh-index and verified via a fresh `vanic add symbolic` across
       all four run/build × backend combinations (namespaced calls, e.g.
       `symbolic::sym_add`, `symbolic::ExprNode`).
-- [ ] **vani-symbolic v0.2.0** — simplification: constant folding, identities,
-      canonical commutative-operand ordering, like-term collection.
-      **Highest-risk phase in the whole tier** — budget the most review time;
-      validate via property-based checks (`simplify(e)` vs `e` evaluated at
-      sample points), not just hand-picked examples.
+- [x] ~~**vani-symbolic v0.2.0**~~ ✅ published 2026-07-25
+      — simplification: `sym_simplify` in two layers -- constant folding
+      + identities for `Mul`/`Div`/`Pow`/`Neg` (`_sym_fold_binary`), and
+      flatten-and-collect like-term collection for `Add`/`Sub`
+      (`_sym_flatten_sum`/`_sym_simplify_sum`), deliberately scoped to
+      flat linear combinations of `Num`/`Var`/`Mul(Num,Var)` monomials --
+      NOT general polynomial normal form (no multiplicative factor
+      combination, no cross-operator associativity flattening). Builds
+      into a SEPARATE output arena, never mutating the source in place.
+      **Was the flagged highest-risk phase in the whole tier** — validated
+      primarily via property-based random sampling (`seed_rng` +
+      `rand_in_range`, deterministic, 8 sample points per case) confirming
+      `sym_eval(simplify(e)) == sym_eval(e)`, not just hand-picked
+      examples, per this checklist's own prior note. Every bug found
+      during development was a test-expectation bug (an overly strict
+      assertion, a scope mismatch against Layer 1's documented boundary),
+      not an algorithm bug -- both layers passed on the first real
+      attempt. `vanic audit-safety` needed exactly one added attribute,
+      matching the pre-implementation prediction that recursive
+      simplification functions would be exempt. Published to kosh-index
+      and verified via a fresh `vanic add symbolic` across all four
+      run/build × backend combinations.
 - [ ] **vani-symbolic v0.3.0** — symbolic differentiation (`sym_diff`):
       sum/product/quotient/chain/power rules. Validate against
       vani-calculus's `diff_central` at sample points.
@@ -59,13 +76,22 @@ Full scope, the closures/lifetime-variable question (resolved: no compiler
 prerequisite, use the same arena pattern as vani-symbolic), and risk notes
 per phase are in ROADMAP.md's
 ["`vani-ml` scoping breakdown"](ROADMAP.md#vani-ml-scoping-breakdown).
-Repo scaffolded 2026-07-25 (`vani.toml` + doc skeleton only). Not started.
 
-- [ ] **vani-ml v0.1.0** — classical ML: linear regression (wraps
-      vani-probability's MLR), logistic regression (cross-entropy loss +
-      vani-optimize's gradient descent), k-means clustering, train/test
-      split, core metrics (accuracy, MSE, precision/recall). Depends on:
-      vani-probability, vani-optimize (both published).
+- [x] ~~**vani-ml v0.1.0**~~ ✅ built 2026-07-25, **not yet published** —
+      classical ML: `linreg_*` (thin wrapper over vani-probability's MLR),
+      `logreg_*` (cross-entropy loss, **own gradient-descent loop, not
+      vani-optimize's** — its fixed `fn(ref Vec<f64>, i64) -> f64`
+      objective/gradient signature can't carry training data through
+      without a ref-capturing closure), `kmeans_*` (Lloyd's algorithm,
+      genuinely new code), `train_test_split` (seeded Fisher-Yates),
+      `mse`/`accuracy`/`precision`/`recall`/`f1_score`. 4 test files pass
+      `vanic test` + full SMT `vanic check`; `vanic audit-safety` reports
+      full `#[bounded_stack]` coverage (20/20 src functions) with no
+      escape hatch. Example verified on both LLVM and C backends. Found
+      and filed a real LLVM-backend crash along the way (BUG-6: standalone
+      unary-minus float literal panics codegen; `vanic check` accepts it
+      fine) — not fixed, worked around with `0.0 - 3.0`. Stopping before
+      `vanic publish` per this package's plan — awaiting go-ahead.
 - [ ] **vani-ml v0.2.0** — data utilities: feature scaling, one-hot
       encoding, a `Dataset` struct (row-major, matches vani-matrix/
       vani-tensor convention), k-fold cross-validation.
