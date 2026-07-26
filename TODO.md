@@ -54,9 +54,23 @@ Full scope, architecture decision (arena representation, not recursive
       simplification functions would be exempt. Published to kosh-index
       and verified via a fresh `vanic add symbolic` across all four
       run/build × backend combinations.
-- [ ] **vani-symbolic v0.3.0** — symbolic differentiation (`sym_diff`):
-      sum/product/quotient/chain/power rules. Validate against
-      vani-calculus's `diff_central` at sample points.
+- [x] ~~**vani-symbolic v0.3.0**~~ ✅ published 2026-07-26
+      — symbolic differentiation: `sym_diff(arena, root, var_id)`, one
+      rule per node kind (sum/difference/negation/product/quotient/
+      power+chain), appending new derivative nodes to the SAME arena
+      (reusing existing indices for unchanged subexpressions, unlike
+      `sym_simplify`'s separate-arena design). Raw output intentionally
+      unsimplified -- composes with `sym_simplify` per the plan. Cross-
+      checked against vendored `vani-calculus`'s `diff_central` (numeric
+      derivative) at integer sample points, both for a plain polynomial
+      and a chain-rule case; full test suite + composed example verified
+      byte-identical on both backends (run and build/AOT), full SMT
+      `vanic check` clean, `vanic audit-safety` reports full coverage
+      with no gap introduced. Published to kosh-index and verified via a
+      fresh `vanic add symbolic` across all four run/build × backend
+      combinations (namespaced calls, e.g. `symbolic::sym_diff`).
+      `vani-calculus` vendored for tests/examples only -- production
+      `sym_diff` has zero calls into it.
 - [ ] **vani-symbolic v0.5.0** — simple equation solving: linear directly,
       quadratic by reusing vani-algebra's existing closed-form solver. Cheap;
       can be pulled ahead of v0.4.0 if integration stalls.
