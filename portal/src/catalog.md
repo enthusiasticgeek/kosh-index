@@ -138,7 +138,7 @@ optimize = { registry = "kosh", version = "^0.1" }
 
 ## geometry
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
 Computational and analytic geometry library for the vāṇी compiler.
 `Point2D`/`Point3D`/`Plane` are plain `f64`-field structs (freely copyable,
@@ -149,9 +149,12 @@ intersection, triangle/polygon area/perimeter/centroid, point-in-polygon,
 convex hull (Andrew's monotone chain), brute-force closest pair, circumcircle
 construction, conic-section classification (ellipse/parabola/hyperbola), 3D
 planes and skew-line distance, and the law-of-cosines triangle angle.
+`circumcenter` and `convex_hull` reject degenerate input (collinear points,
+fewer than 3 points) with a clean assertion rather than returning a
+meaningless result (0.1.2).
 
 - **Repository:** [enthusiasticgeek/vani-geometry](https://github.com/enthusiasticgeek/vani-geometry)
-- **Checksum (0.1.0):** `372340c0…9818e86`
+- **Checksum (0.1.2):** `e423941b…3a1a0d7`
 
 ```toml
 [deps]
@@ -162,7 +165,7 @@ geometry = { registry = "kosh", version = "^0.1" }
 
 ## signal
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
 
 Digital signal processing library for the vāṇी compiler. Time/sample-domain
 data is `Vec<f64>`; frequency-domain data is `Vec<Complex>` (from `complex`).
@@ -170,11 +173,11 @@ data is `Vec<f64>`; frequency-domain data is `Vec<Complex>` (from `complex`).
 Includes naive DFT/IDFT (any length), Cooley-Tukey radix-2 FFT/IFFT (power-of-2
 length, with a real-input convenience wrapper), magnitude/power spectrum and
 frequency-bin helpers, zero-padding utilities, linear/circular convolution,
-cross-correlation, Hann/Hamming/Blackman/rectangular windowing, and numeric
-(trapezoidal) Laplace and Z transforms.
+cross-correlation, Hann/Hamming/Blackman/Bartlett/Kaiser/Tukey/rectangular
+windowing, and numeric (trapezoidal) Laplace and Z transforms.
 
 - **Repository:** [enthusiasticgeek/vani-signal](https://github.com/enthusiasticgeek/vani-signal)
-- **Checksum (0.1.0):** `225861fb…c7425817`
+- **Checksum (0.1.4):** `43fb2c64…a7a3293`
 
 ```toml
 [deps]
@@ -264,7 +267,7 @@ algebra = { registry = "kosh", version = "^0.1" }
 
 ## sparse
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
+**Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
 
 Sparse matrix format and operations library for the vāṇी compiler. Two
 struct types: `SparseCOO` (easy to build incrementally) and `SparseCSR`
@@ -274,11 +277,13 @@ is byte-for-byte vani-matrix's row-major layout.
 Includes COO/CSR/dense conversions (with duplicate-entry summing),
 `sparse_csr_matvec` (O(nnz) matrix-vector product), transpose, scale, add,
 and `sparse_csr_matmul` (sparse-sparse multiply via Gustavson's algorithm).
-Every operation is cross-checked against the equivalent dense vani-matrix
+`sparse_csr_get` looks up a single element via binary search within its row
+(0.1.3), relying on `col_idx`'s existing per-row-sorted invariant. Every
+operation is cross-checked against the equivalent dense vani-matrix
 operation on the same data.
 
 - **Repository:** [enthusiasticgeek/vani-sparse](https://github.com/enthusiasticgeek/vani-sparse)
-- **Checksum (0.1.0):** `2b0cd8e9…2e5b26e3b`
+- **Checksum (0.1.3):** `b3d59282…366a4c0`
 
 ```toml
 [deps]
@@ -376,7 +381,7 @@ interval = { registry = "kosh", version = "^0.1" }
 
 ## bignum
 
-**Version:** 0.1.1 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
 Arbitrary-precision integer library for the vāṇी compiler -- numeric
 foundation for the planned symbolic-math tier. `BigInt` owns a `Vec<i64>`
@@ -390,11 +395,13 @@ and `implement Eq for BigInt` so `==`/`!=` work directly), arithmetic
 (add/sub/mul -- schoolbook multiply with immediate per-product carry
 propagation, the overflow-safety-critical design choice), truncating
 division/modulo (long division, binary-searching each quotient digit
-against the running remainder), and GCD (Euclidean algorithm). Integers
-only in v0.1.0 -- rational numbers are planned for v0.2.0.
+against the running remainder), GCD (Euclidean algorithm), and
+exponentiation -- `bn_pow_i64` (squaring) and `bn_pow_mod` (modular,
+reducing after every multiply so intermediates stay bounded by the
+modulus) (0.1.2). Integers only -- rational numbers are planned for v0.2.0.
 
 - **Repository:** [enthusiasticgeek/vani-bignum](https://github.com/enthusiasticgeek/vani-bignum)
-- **Checksum (0.1.1):** `d09d3700…7c0deb8e`
+- **Checksum (0.1.2):** `f16d692c…e4e12b2`
 
 ```toml
 [deps]
