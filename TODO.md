@@ -123,14 +123,35 @@ per phase are in ROADMAP.md's
       dedicated DAG/shared-node-accumulation test and a composed
       multi-op test. `vani-tensor` turned out not to be a real
       dependency for this phase (deferred to v0.4.0, see ROADMAP.md).
-- [ ] **vani-ml v0.4.0** — dense/linear layer, activations (relu/sigmoid/
-      tanh/softmax), losses (MSE, cross-entropy) as graph node kinds.
-- [ ] **vani-ml v0.5.0** — optimizers over the graph's parameter vector:
-      SGD, momentum, Adam. New code (vani-optimize's solvers don't fit
-      this signature), same underlying math.
-- [ ] **vani-ml v0.6.0+** (optional/stretch) — training-loop utilities,
-      batching, worked small-MLP examples. Revisit scope once the core
-      phases are shipped and actually used.
+- [x] ~~**vani-ml v0.4.0**~~ ✅ published 2026-08-16 — `relu`/`sigmoid`/
+      `tanh`/`log` as new graph node kinds; dense layer and MSE/binary-
+      cross-entropy losses composed from existing `graph_mul`/`graph_add`/
+      `graph_sub`/`graph_const` primitives rather than new kinds — no
+      `matrix`/`tensor` dependency needed, matmul emerges from scalar-op
+      composition. `softmax` deliberately NOT added (inherently
+      multi-output, a structural mismatch with the one-node-one-scalar
+      design; this package's classification support has always been
+      binary-only). 9 new finite-difference tests.
+- [x] ~~**vani-ml v0.5.0**~~ ✅ published 2026-08-16 — SGD, Momentum, Adam
+      over the graph's parameter vector. Confirmed (not just anticipated)
+      vani-optimize's solvers don't fit this signature. `MomentumState`/
+      `AdamState` returned fresh per step, not mutated in place. 6 new
+      tests: hand-computed single-step exactness per optimizer plus a
+      real convergence check per optimizer.
+- [x] ~~**vani-ml v0.6.0+**~~ ✅ published 2026-08-16, CLOSED not left
+      open — `shuffled_indices` utility plus one thorough worked example:
+      a 2-2-1 MLP trained on XOR (the canonical problem a single
+      dense+sigmoid layer provably cannot solve), all 9 params shared
+      across all 4 training examples in one arena, loss ~0.72 → ~0.0001
+      over 3000 Adam epochs on both backends. This tier's entire
+      originally-scoped roadmap (v0.1.0-v0.6.0+) is now shipped.
+- [x] ~~**BUG-197** (vani-compiler)~~ ✅ fixed 2026-08-16 — found while
+      publishing this tier's 4 back-to-back version bumps: `vanic
+      publish` fetched a package's current index file via its
+      CDN-cached `download_url` instead of the metadata response's own
+      `content` field, which silently dropped the `ml` v0.5.0 index
+      entry when two publishes landed within the CDN's cache-lag
+      window. Fixed upstream; the dropped entry was manually restored.
 
 ---
 

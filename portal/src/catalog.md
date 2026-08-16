@@ -448,33 +448,54 @@ symbolic = { registry = "kosh", version = "^0.1" }
 
 ## ml
 
-**Version:** 0.3.0 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
+**Version:** 0.6.0 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
 
-Machine learning library for the vāṇी compiler. Staged: classical ML first
-(v0.1.0-v0.2.0), an autodiff/neural-net engine on top (v0.3.0+).
+Machine learning library for the vāṇी compiler. Staged: classical ML
+first (v0.1.0-v0.2.0), then a full autodiff/neural-net engine on top
+(v0.3.0-v0.6.0) -- the whole roadmap now shipped.
 
 Classical ML: linear regression (thin wrapper over `probability::mlr_*`),
 logistic regression (own gradient-descent loop -- `optimize`'s fixed
 function-pointer signature can't thread training data through without a
 ref-capturing closure), k-means clustering (Lloyd's algorithm), train/test
 split, core metrics. Data utilities (v0.2.0): feature scaling, one-hot
-encoding, k-fold cross-validation. Autodiff core (v0.3.0): a flat-arena
-computation graph (`GraphNode` + `i64` child indices, same workaround
-`symbolic` uses for its expression tree) with reverse-mode automatic
-differentiation -- both the forward and backward passes are single linear
-loops (no recursion, no topological sort needed, since the append-only
-arena is already in topological order by construction). Validated via
-finite-difference gradient checking cross-checked against
-`calculus::diff_central`, including a dedicated test for correct
-gradient accumulation when one value is used by multiple graph nodes.
+encoding, k-fold cross-validation.
+
+Autodiff core (v0.3.0): a flat-arena computation graph (`GraphNode` +
+`i64` child indices, same workaround `symbolic` uses for its expression
+tree) with reverse-mode automatic differentiation -- both the forward
+and backward passes are single linear loops (no recursion, no
+topological sort needed, since the append-only arena is already in
+topological order by construction). Validated via finite-difference
+gradient checking cross-checked against `calculus::diff_central`,
+including a dedicated test for correct gradient accumulation when one
+value is used by multiple graph nodes.
+
+Layers/activations/losses (v0.4.0): `relu`/`sigmoid`/`tanh`/`log` as new
+graph node kinds; dense layers and MSE/binary-cross-entropy losses
+composed from existing primitives rather than new kinds (matmul emerges
+from scalar-op composition -- no `matrix`/`tensor` dependency needed for
+any of this).
+
+Optimizers (v0.5.0): SGD, Momentum, Adam over the graph's parameter
+vector, each returning a fresh state struct per step.
+
+v0.6.0 closes the roadmap with a full worked example: a 2-2-1 MLP
+trained on XOR (the canonical problem a single dense+sigmoid layer
+provably cannot solve), converging from ~0.72 to ~0.0001 loss over 3000
+Adam epochs, identical on both backends -- real end-to-end proof the
+whole stack composes correctly.
 
 - **Repository:** [enthusiasticgeek/vani-ml](https://github.com/enthusiasticgeek/vani-ml)
+- **Checksum (0.6.0):** `0689a73b…77d7aa4`
+- **Checksum (0.5.0):** `e16747c8…19d8d96`
+- **Checksum (0.4.0):** `0fa33001…9add90ef6`
 - **Checksum (0.3.0):** `aeabc328…be31aa`
 - **Checksum (0.1.0):** `7dab3082…480880`
 
 ```toml
 [deps]
-ml = { registry = "kosh", version = "^0.3" }
+ml = { registry = "kosh", version = "^0.6" }
 ```
 
 ---
