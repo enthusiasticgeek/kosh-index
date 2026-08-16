@@ -91,7 +91,7 @@ prerequisite, use the same arena pattern as vani-symbolic), and risk notes
 per phase are in ROADMAP.md's
 ["`vani-ml` scoping breakdown"](ROADMAP.md#vani-ml-scoping-breakdown).
 
-- [x] ~~**vani-ml v0.1.0**~~ ✅ built 2026-07-25, **not yet published** —
+- [x] ~~**vani-ml v0.1.0**~~ ✅ published 2026-07-26 —
       classical ML: `linreg_*` (thin wrapper over vani-probability's MLR),
       `logreg_*` (cross-entropy loss, **own gradient-descent loop, not
       vani-optimize's** — its fixed `fn(ref Vec<f64>, i64) -> f64`
@@ -104,18 +104,25 @@ per phase are in ROADMAP.md's
       escape hatch. Example verified on both LLVM and C backends. Found
       and filed a real LLVM-backend crash along the way (BUG-6: standalone
       unary-minus float literal panics codegen; `vanic check` accepts it
-      fine) — not fixed, worked around with `0.0 - 3.0`. Stopping before
-      `vanic publish` per this package's plan — awaiting go-ahead.
-- [ ] **vani-ml v0.2.0** — data utilities: feature scaling, one-hot
-      encoding, a `Dataset` struct (row-major, matches vani-matrix/
-      vani-tensor convention), k-fold cross-validation.
-- [ ] **vani-ml v0.3.0** — autodiff core: flat arena (`Vec<Node>` + `i64`
-      child indices, same pattern as vani-symbolic), forward eval,
-      reverse-mode backward pass via explicit `mut ref Vec<f64>` gradient
-      buffers (not ref-capturing closures — those are compiler path-D,
-      deferred indefinitely, see ROADMAP.md). **Highest-risk phase in this
-      tier** — validate via finite-difference gradient checking against
-      every node kind, not hand-picked examples.
+      fine) — not fixed, worked around with `0.0 - 3.0`.
+- [x] ~~**vani-ml v0.2.0**~~ ✅ built 2026-07-27 — data utilities: feature
+      scaling, one-hot encoding, a `Dataset` struct (row-major, matches
+      vani-matrix/vani-tensor convention), k-fold cross-validation.
+- [x] ~~**vani-ml v0.3.0**~~ ✅ published 2026-08-16 — autodiff core: flat
+      arena (`GraphNode` + `i64` child indices, same pattern as
+      vani-symbolic, deliberately no symbol table since graphs are built
+      directly, not parsed from names), forward eval and reverse-mode
+      backward pass as two single linear loops (no recursion, no
+      topological sort needed — the append-only arena is already
+      topologically ordered by construction), gradients returned as a
+      fresh `Vec<f64>` (not a `mut ref` out-parameter — no ref-capturing
+      closures used anywhere, that's still compiler path-D, deferred
+      indefinitely). **Highest-risk phase in this tier** — validated via
+      finite-difference gradient checking cross-checked against
+      `vani-calculus::diff_central`, against every node kind plus a
+      dedicated DAG/shared-node-accumulation test and a composed
+      multi-op test. `vani-tensor` turned out not to be a real
+      dependency for this phase (deferred to v0.4.0, see ROADMAP.md).
 - [ ] **vani-ml v0.4.0** — dense/linear layer, activations (relu/sigmoid/
       tanh/softmax), losses (MSE, cross-entropy) as graph node kinds.
 - [ ] **vani-ml v0.5.0** — optimizers over the graph's parameter vector:

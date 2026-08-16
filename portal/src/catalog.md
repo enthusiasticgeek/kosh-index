@@ -446,6 +446,39 @@ symbolic = { registry = "kosh", version = "^0.1" }
 
 ---
 
+## ml
+
+**Version:** 0.3.0 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
+
+Machine learning library for the vāṇी compiler. Staged: classical ML first
+(v0.1.0-v0.2.0), an autodiff/neural-net engine on top (v0.3.0+).
+
+Classical ML: linear regression (thin wrapper over `probability::mlr_*`),
+logistic regression (own gradient-descent loop -- `optimize`'s fixed
+function-pointer signature can't thread training data through without a
+ref-capturing closure), k-means clustering (Lloyd's algorithm), train/test
+split, core metrics. Data utilities (v0.2.0): feature scaling, one-hot
+encoding, k-fold cross-validation. Autodiff core (v0.3.0): a flat-arena
+computation graph (`GraphNode` + `i64` child indices, same workaround
+`symbolic` uses for its expression tree) with reverse-mode automatic
+differentiation -- both the forward and backward passes are single linear
+loops (no recursion, no topological sort needed, since the append-only
+arena is already in topological order by construction). Validated via
+finite-difference gradient checking cross-checked against
+`calculus::diff_central`, including a dedicated test for correct
+gradient accumulation when one value is used by multiple graph nodes.
+
+- **Repository:** [enthusiasticgeek/vani-ml](https://github.com/enthusiasticgeek/vani-ml)
+- **Checksum (0.3.0):** `aeabc328…be31aa`
+- **Checksum (0.1.0):** `7dab3082…480880`
+
+```toml
+[deps]
+ml = { registry = "kosh", version = "^0.3" }
+```
+
+---
+
 ## hello-kosh
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
