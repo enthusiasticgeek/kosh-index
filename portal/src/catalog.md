@@ -32,7 +32,7 @@ matrix = { registry = "kosh", version = "^0.2" }
 
 ## calculus
 
-**Version:** 0.3.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.3.1 &nbsp;|&nbsp; **Deps:** none
 
 Numerical calculus library for the vāṇी compiler.
 
@@ -63,7 +63,7 @@ calculus = { registry = "kosh", version = "^0.3" }
 
 ## probability
 
-**Version:** 0.4.2 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
+**Version:** 0.4.7 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
 
 Probability and statistics library for the vāṇी compiler.
 
@@ -92,7 +92,7 @@ probability = { registry = "kosh", version = "^0.4.2" }
 
 ## complex
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
 Complex number library for the vāṇी compiler. `Complex` is a plain
 `{ re: f64, im: f64 }` struct (no heap-owning fields, so it's freely copyable --
@@ -267,7 +267,7 @@ algebra = { registry = "kosh", version = "^0.1" }
 
 ## sparse
 
-**Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
 
 Sparse matrix format and operations library for the vāṇी compiler. Two
 struct types: `SparseCOO` (easy to build incrementally) and `SparseCSR`
