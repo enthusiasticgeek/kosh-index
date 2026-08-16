@@ -2,14 +2,15 @@
 
 Task list distilled from [`ROADMAP.md`](ROADMAP.md), which stays the source of
 truth for scope/rationale — this file is just the actionable checklist. Last
-distilled: 2026-07-25.
+distilled: 2026-08-16.
 
 > **Context**: the numeric/scientific tier (12 packages, every gap-analysis
-> row, all 5 MAINT items) is fully shipped. Everything below is what's left.
+> row, all 5 MAINT items), the symbolic tier, and the ML tier are all fully
+> shipped. Nothing planned in this document remains open.
 
 ---
 
-## Symbolic tier (optional — confirm before starting each phase)
+## Symbolic tier ✅ CLOSED 2026-08-16
 
 Full scope, architecture decision (arena representation, not recursive
 `Box<Self>`), and risk notes per phase are in ROADMAP.md's
@@ -71,20 +72,54 @@ Full scope, architecture decision (arena representation, not recursive
       combinations (namespaced calls, e.g. `symbolic::sym_diff`).
       `vani-calculus` vendored for tests/examples only -- production
       `sym_diff` has zero calls into it.
-- [ ] **vani-symbolic v0.5.0** — simple equation solving: linear directly,
-      quadratic by reusing vani-algebra's existing closed-form solver. Cheap;
-      can be pulled ahead of v0.4.0 if integration stalls.
-- [ ] **vani-symbolic v0.4.0** (optional/stretch) — basic symbolic
-      integration via a fixed pattern table (no general/Risch algorithm).
-      Validate every firing rule via `sym_diff(result) == original`.
-- [ ] **vani-symbolic v0.6.0+** — polynomial factorization (rational-root
-      theorem + synthetic division), folding in what would have been a
-      separate `vani-polyalgebra` repo. Gröbner bases stay out of scope
-      unless a real use case shows up.
+- [x] ~~**vani-symbolic v0.5.0**~~ ✅ published 2026-08-16 (as package v0.5.0)
+      — simple equation solving: linear directly, quadratic by reusing
+      vani-algebra's existing closed-form solver (`algebra_poly_roots_real`)
+      rather than reimplementing it. Pulled ahead of v0.4.0 as planned.
+      The real work: `sym_poly_coeffs_le2` extracts `[c0,c1,c2]` from a
+      symbolic tree, reusing `_sym_flatten_sum` (the same proven Add/Sub
+      walker `sym_simplify` already had). Vendoring `vani-algebra` hit a
+      real transitive-dependency version conflict (its own vendored
+      `calculus` was stale) — fixed by bumping and republishing
+      `vani-algebra` itself (v0.1.3 → v0.1.4) first. 8 tests, full SMT
+      `vanic check` clean, both backends verified via `examples/solve_demo.vani`.
+- [x] ~~**vani-symbolic v0.4.0**~~ ✅ published 2026-08-16 (as package v0.6.0
+      — v0.5.0 had already claimed package version `0.5.0`, so this
+      phase published as `0.6.0` to stay ahead of it)
+      — basic symbolic integration via a fixed pattern table (no general/
+      Risch algorithm). **Scope correction found during implementation**:
+      dropped the roadmap's original `exp`/`ln`/`sin`/`cos` antiderivative
+      wording — `ExprNode`'s kind set never grew past v0.1.0's original 8
+      kinds, and adding transcendental kinds would mean touching every
+      existing walker. Shipped polynomial-only: power rule, linearity,
+      constant-multiple/divisor rules, and linear `u`-substitution
+      (`(ax+b)^n`) via a new `_sym_linear_shape` helper. Validated exactly
+      per plan: `sym_diff(sym_integrate(f))` evaluated via `sym_eval`
+      against `f` at sample points — landed clean on the first full test
+      pass (12 tests, full SMT `vanic check` clean, both backends verified
+      via `examples/integrate_demo.vani`).
+- [x] ~~**vani-symbolic v0.6.0+**~~ ✅ published 2026-08-16 (as package v0.7.0)
+      — polynomial factorization (rational-root theorem + synthetic
+      division), folding in what would have been a separate
+      `vani-polyalgebra` repo. Gröbner bases stayed out of scope, as
+      planned. Rational-root detection is exact integer arithmetic
+      (`q^deg * P(p/q)`, multiplying through rather than dividing — zero
+      floating-point error); repeated-root multiplicity uses a numeric
+      epsilon fallback, reusing `vani-algebra`'s already-published
+      `algebra_poly_deflate` rather than reimplementing synthetic
+      division. Symbolic-tree wrappers (`sym_poly_coeffs`/
+      `sym_factor_rational`) generalize v0.5.0's degree≤2 extractor to
+      arbitrary degree via a dynamically-grown `Vec<i64>`. A real bug (a
+      zero constant term silently skipping the rest of the root search —
+      `x^2-4x` reported only root `0`, missing `4`) was caught by
+      `tests/test_factor.vani` on the very first test run, not by
+      inspection. 12 tests, full SMT `vanic check` clean, both backends
+      verified via `examples/factor_demo.vani`. This closes out the
+      entire `vani-symbolic` roadmap.
 
 ---
 
-## ML tier (optional — confirm before starting each phase)
+## ML tier ✅ CLOSED 2026-08-16
 
 Full scope, the closures/lifetime-variable question (resolved: no compiler
 prerequisite, use the same arena pattern as vani-symbolic), and risk notes

@@ -384,7 +384,7 @@ interval = { registry = "kosh", version = "^0.1" }
 **Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
 Arbitrary-precision integer library for the vāṇी compiler -- numeric
-foundation for the planned symbolic-math tier. `BigInt` owns a `Vec<i64>`
+foundation for the symbolic-math tier (`symbolic`, below). `BigInt` owns a `Vec<i64>`
 of base-1,000,000,000 (1e9) digit limbs (not Copy, unlike `complex`'s
 `Complex`), chosen because vāṇी has no integer type wider than `i64` and
 `+`/`-`/`*` trap on overflow rather than wrap.
@@ -412,36 +412,64 @@ bignum = { registry = "kosh", version = "^0.1" }
 
 ## symbolic
 
-**Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.7.0 &nbsp;|&nbsp; **Deps:** algebra ^0.1 (real registry
+dependency, equation solving + factorization); calculus ^0.3
+(tests/examples-only cross-check, not a production dependency)
 
 Symbolic-math (CAS) foundation for the vāṇी compiler -- expression
-construction, numeric evaluation, precedence-aware printing, and
-simplification. No differentiation/integration/equation-solving yet.
+construction, numeric evaluation, precedence-aware printing,
+simplification, differentiation, equation solving, integration, and
+polynomial factorization. The full roadmap shipped 2026-08-16.
 `ExprNode` is a Copy struct (four `i64` fields) living in a flat
 `Vec<ExprNode>` arena with `i64` child indices instead of pointers,
 chosen because a recursive `Box<Self>` enum doesn't compile in vāṇी
 today (single-payload-field enum restriction plus no self-referential
-`box()` payloads).
+`box()` payloads) -- the same workaround `ml`'s autodiff `GraphNode`
+arena reuses.
 
 Includes construction (`sym_num`/`sym_var`/`sym_add`/`sym_sub`/`sym_mul`/
 `sym_div`/`sym_pow`/`sym_neg`, symbol-table interning), introspection
 (`sym_kind`/`sym_is_leaf`), numeric evaluation (`sym_eval`, nonnegative-
 integer `Pow` exponents only), a precedence-aware pretty-printer
 (`sym_to_str`, matching SymPy's `str()` spacing convention), structural
-equality (`sym_eq_structural`, same-shape only -- not commutative), and
-simplification (`sym_simplify`, v0.2.0: constant folding + identities
-for `Mul`/`Div`/`Pow`/`Neg`, plus flatten-and-collect like-term
-collection for `Add`/`Sub` -- deliberately scoped to flat linear
-combinations of monomials, not general polynomial normal form).
-Validated via property-based random-sampling checks
-(`seed_rng`/`rand_in_range`), not just hand-picked examples.
+equality (`sym_eq_structural`, same-shape only -- not commutative),
+simplification (`sym_simplify`: constant folding + identities for
+`Mul`/`Div`/`Pow`/`Neg`, plus flatten-and-collect like-term collection
+for `Add`/`Sub` -- deliberately scoped to flat linear combinations of
+monomials, not general polynomial normal form), and symbolic
+differentiation (`sym_diff`: sum/product/quotient/power+chain rules,
+one per node kind, cross-checked against `calculus::diff_central`).
+
+Equation solving (`sym_solve_poly_le2`/`sym_solve_equation_le2`, degree
+<=2): extracts polynomial coefficients from an expression tree, then
+reuses `algebra::algebra_poly_roots_real` rather than reimplementing a
+closed-form solver. Polynomial integration (`sym_integrate`): a fixed
+pattern table over the power rule, linearity, constant-multiple/divisor
+rules, and linear `u`-substitution (`(ax+b)^n`), scoped to polynomials
+only -- not the transcendental (`exp`/`ln`/`sin`/`cos`) antiderivatives
+originally proposed, since `ExprNode`'s kind set never grew past its
+original 8 kinds. Validated via the fundamental theorem of calculus
+(`sym_diff(sym_integrate(f))` evaluated against `f` at sample points).
+Polynomial factorization (`poly_rational_roots`/`poly_factor_rational`,
+plus symbolic-tree wrappers `sym_poly_coeffs`/`sym_factor_rational`):
+rational-root theorem via exact integer arithmetic (zero floating-point
+error in detection) plus synthetic division, reusing
+`algebra::algebra_poly_deflate` for repeated-root multiplicity and
+whatever's left over. Gröbner bases and non-rational factorization stay
+out of scope -- this folds in what would have been a separate
+`vani-polyalgebra` repo.
+
+Every simplification/differentiation phase was validated via property-
+based random-sampling or cross-package numeric checks
+(`seed_rng`/`rand_in_range`, `calculus::diff_central`), not just
+hand-picked examples.
 
 - **Repository:** [enthusiasticgeek/vani-symbolic](https://github.com/enthusiasticgeek/vani-symbolic)
-- **Checksum (0.2.0):** `ef9e6fbf…eb66ee855`
+- **Checksum (0.7.0):** `a9574c5c…4b8ff2fd`
 
 ```toml
 [deps]
-symbolic = { registry = "kosh", version = "^0.1" }
+symbolic = { registry = "kosh", version = "^0.7" }
 ```
 
 ---
