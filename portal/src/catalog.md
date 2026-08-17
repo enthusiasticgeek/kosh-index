@@ -32,7 +32,7 @@ matrix = { registry = "kosh", version = "^0.2" }
 
 ## calculus
 
-**Version:** 0.3.1 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.3.2 &nbsp;|&nbsp; **Deps:** none
 
 Numerical calculus library for the vāṇī compiler.
 
@@ -53,6 +53,7 @@ mean).
 - **Checksum (0.1.0):** `4131d2cd…e626a3e`
 - **Checksum (0.2.0):** `9cfe9db8…04ca6a`
 - **Checksum (0.3.0):** `b3a728d6…de24b20e`
+- **Checksum (0.3.2):** `a525e8b6…79c9fc`
 
 ```toml
 [deps]
@@ -63,7 +64,7 @@ calculus = { registry = "kosh", version = "^0.3" }
 
 ## probability
 
-**Version:** 0.4.7 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
+**Version:** 0.4.8 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
 
 Probability and statistics library for the vāṇī compiler.
 
@@ -82,6 +83,7 @@ geometric Brownian motion, Kalman filtering).
 - **Checksum (0.4.0):** `762ad554…11f364`
 - **Checksum (0.4.1):** `ef4eeed2…a7a5a34`
 - **Checksum (0.4.2):** `0d1a729a…655680`
+- **Checksum (0.4.8):** `72e92be4…e90992`
 
 ```toml
 [deps]
@@ -115,7 +117,7 @@ complex = { registry = "kosh", version = "^0.1" }
 
 ## optimize
 
-**Version:** 0.1.6 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+**Version:** 0.1.7 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
 Numerical optimization library for the vāṇī compiler.
 
@@ -129,6 +131,7 @@ tableau simplex linear-programming solver.
 - **Repository:** [enthusiasticgeek/vani-optimize](https://github.com/enthusiasticgeek/vani-optimize)
 - **Checksum (0.1.0):** `56db6d36…44b48`
 - **Checksum (0.1.6):** `22817b79…fcb2ed`
+- **Checksum (0.1.7):** `ecaea2bc…e480c7`
 
 ```toml
 [deps]
@@ -216,7 +219,7 @@ tensor = { registry = "kosh", version = "^0.1" }
 
 ## pde
 
-**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+**Version:** 0.1.5 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
 Finite-difference PDE solver library for the vāṇī compiler. Grids are flat
 row-major `Vec<f64>` (1D: length `n`; 2D: length `nx*ny`, same layout as a
@@ -234,6 +237,7 @@ output.
 - **Repository:** [enthusiasticgeek/vani-pde](https://github.com/enthusiasticgeek/vani-pde)
 - **Checksum (0.1.0):** `a1de34fd…7fdd3224`
 - **Checksum (0.1.4):** `34e7fccf…daa4c3`
+- **Checksum (0.1.5):** `de28bb1a…453fae`
 
 ```toml
 [deps]
@@ -244,7 +248,7 @@ pde = { registry = "kosh", version = "^0.1" }
 
 ## algebra
 
-**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
+**Version:** 0.1.5 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
 
 Polynomial root-finding and nonlinear equation system library for the vāṇī
 compiler. Polynomial coefficients are ascending `Vec<f64>`, matching
@@ -262,6 +266,7 @@ at every step). Real roots only -- no complex-root support in v0.1.0.
 - **Repository:** [enthusiasticgeek/vani-algebra](https://github.com/enthusiasticgeek/vani-algebra)
 - **Checksum (0.1.0):** `c4f8f759…d42b169fdb`
 - **Checksum (0.1.4):** `14ab167a…9d7eac`
+- **Checksum (0.1.5):** `fd35fe2c…c22d32`
 
 ```toml
 [deps]
@@ -389,7 +394,7 @@ interval = { registry = "kosh", version = "^0.1" }
 
 ## bignum
 
-**Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.2.1 &nbsp;|&nbsp; **Deps:** none
 
 Arbitrary-precision integer library for the vāṇī compiler -- numeric
 foundation for the symbolic-math tier (`symbolic`, below). `BigInt` owns a `Vec<i64>`
@@ -414,6 +419,7 @@ denominator), with arithmetic, comparison, and string conversion.
 - **Repository:** [enthusiasticgeek/vani-bignum](https://github.com/enthusiasticgeek/vani-bignum)
 - **Checksum (0.1.2):** `f16d692c…e4e12b2`
 - **Checksum (0.2.0):** `28a11584…82276b`
+- **Checksum (0.2.1):** `cd3dee98…300f31`
 
 ```toml
 [deps]
@@ -424,7 +430,7 @@ bignum = { registry = "kosh", version = "^0.2" }
 
 ## symbolic
 
-**Version:** 0.7.0 &nbsp;|&nbsp; **Deps:** algebra ^0.1 (real registry
+**Version:** 0.7.1 &nbsp;|&nbsp; **Deps:** algebra ^0.1 (real registry
 dependency, equation solving + factorization); calculus ^0.3
 (tests/examples-only cross-check, not a production dependency)
 
@@ -478,6 +484,7 @@ hand-picked examples.
 
 - **Repository:** [enthusiasticgeek/vani-symbolic](https://github.com/enthusiasticgeek/vani-symbolic)
 - **Checksum (0.7.0):** `a9574c5c…4b8ff2fd`
+- **Checksum (0.7.1):** `322cbbf2…1aaaf8`
 
 ```toml
 [deps]
@@ -488,7 +495,7 @@ symbolic = { registry = "kosh", version = "^0.7" }
 
 ## ml
 
-**Version:** 0.6.0 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
+**Version:** 0.6.1 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
 
 Machine learning library for the vāṇī compiler. Staged: classical ML
 first (v0.1.0-v0.2.0), then a full autodiff/neural-net engine on top
@@ -528,6 +535,7 @@ whole stack composes correctly.
 
 - **Repository:** [enthusiasticgeek/vani-ml](https://github.com/enthusiasticgeek/vani-ml)
 - **Checksum (0.6.0):** `0689a73b…77d7aa4`
+- **Checksum (0.6.1):** `fad443f7…30574b`
 - **Checksum (0.5.0):** `e16747c8…19d8d96`
 - **Checksum (0.4.0):** `0fa33001…9add90ef6`
 - **Checksum (0.3.0):** `aeabc328…be31aa`
