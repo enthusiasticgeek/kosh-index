@@ -10,14 +10,16 @@ Compiler-level items that this roadmap depends on (if any) are tracked in
 [vani-compiler's docs/TODO_CURRENT.md](https://github.com/enthusiasticgeek/vani-compiler/blob/main/docs/TODO_CURRENT.md)
 under "Kosh math-library ecosystem" and cross-linked from here.
 
-Last updated: 2026-07-25
+Last updated: 2026-08-17
 
-**Status: the numeric/scientific tier (all 12 packages below) is complete,
+**Status: the numeric/scientific tier (all 14 packages below) is complete,
 every row in the gap-analysis table below is ✅, and every itemized gap
-within those rows (G1-G7, N1-N2, and now N3) is shipped.** What remains
-is the optional symbolic tier — see "Planned: symbolic tier" below — and
-the newly-scoped ML tier — see "Planned: ML tier" below, repo scaffolded
-2026-07-25, no functions implemented yet.
+within those rows (G1-G7, N1-N2, and now N3) is shipped.** The optional
+symbolic tier and the ML tier are both also fully shipped (2026-08-16) --
+see "Symbolic tier — complete" and "ML tier — complete" below. What
+remains is the newly-scoped hardware-acceleration tier — see "Planned:
+hardware-acceleration tier" below, scoped 2026-08-17, not started (no
+GPU in this environment to validate on).
 
 ---
 
@@ -199,7 +201,7 @@ that sequence.
 | 9 | ~~**vani-sparse**~~ ✅ shipped 2026-07-20 | matrix (test/interop only) | Sparse matrix formats (COO to build, CSR to operate on) and core ops -- matvec, transpose, scale, add, matmul (Gustavson's algorithm). Filled the "Linear algebra — sparse matrices" gap-analysis row; added after the original 8-item sequence was already complete. | 17 functions |
 | 10 | ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 | calculus | Gradient/divergence/curl/Laplacian (2D/3D, central finite differences) and double/triple/line integrals via nested reuse of calculus's integrate_simpson (no closures in vāṇī, so integration reuses pre-sampled Vec<f64> instead of a captured function pointer). Filled the "Calculus — vector" gap-analysis row. | 11 functions |
 
-## Planned: symbolic tier (optional, separate scope)
+## Symbolic tier — complete ✅ (optional, separate scope)
 
 This is **not** a scaled-up version of the numeric tier -- it's a qualitatively
 different problem. Correctness bugs compound silently (a wrong simplification rule
@@ -282,11 +284,12 @@ version numbers, because of the v0.5.0-before-v0.4.0 reordering).
 
 ---
 
-## Planned: ML tier (scoped 2026-07-25)
+## ML tier — complete ✅ (scoped 2026-07-25, shipped 2026-08-16)
 
 A third tier, distinct from both the numeric and symbolic tiers above --
-not a numeric-tier gap-fill row and not CAS. `vani-ml` repo scaffolded
-2026-07-25 (`vani.toml` + doc skeleton only, no functions implemented).
+not a numeric-tier gap-fill row and not CAS. `vani-ml`'s full v0.1.0-v0.6.0+
+roadmap shipped 2026-08-16 (see the table row below for what each phase
+delivered).
 
 **Deliberately staged in one repo, not split across repos** -- consistent
 with how this ecosystem draws repo boundaries by *domain*, not by
@@ -484,7 +487,7 @@ repos too.
 7. ~~**vani-sparse**~~ ✅ shipped 2026-07-20 and ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 -- filled the "Linear algebra — sparse matrices" and "Calculus — vector" gap-analysis rows, requested separately from the ordered sequence above. Every gap-analysis row is now ✅.
 8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7), ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2), and ~~**vani-interval**~~ ✅ shipped 2026-07-21 (N3) -- itemized follow-up gaps under the "mostly done" rows, each requested separately after step 7. Every itemized gap in this document is now shipped.
 9. ~~Symbolic tier~~ ✅ CLOSED 2026-08-16. ~~**vani-bignum**~~ ✅ shipped 2026-07-24 -- the exact-arithmetic foundation. **vani-symbolic** phased breakdown (v0.1.0 construction/print/eval → v0.2.0 simplification → v0.3.0 differentiation → v0.5.0 equation solving → v0.4.0 integration → v0.6.0+ polynomial factorization, folding in what would've been vani-polyalgebra) scoped 2026-07-24, all six phases shipped and published (as package versions 0.1.0-0.3.0, 0.5.0, 0.6.0, 0.7.0 -- package version numbers diverge from phase numbers because v0.5.0 published before v0.4.0), see [above](#vani-symbolic-scoping-breakdown-added-2026-07-24).
-10. ~~ML tier~~ ✅ CLOSED 2026-08-16, independent of the symbolic tier (depended only on the numeric tier, which was done). **vani-ml** phased breakdown (v0.1.0 classical ML → v0.2.0 data utilities → v0.3.0 autodiff core → v0.4.0 layers/activations/losses → v0.5.0 optimizers → v0.6.0+ training-loop utilities/stretch) scoped 2026-07-25, all phases shipped and published, see [above](#planned-ml-tier-scoped-2026-07-25). Both the symbolic and ML tiers are now closed; every planned repo in this document has shipped.
+10. ~~ML tier~~ ✅ CLOSED 2026-08-16, independent of the symbolic tier (depended only on the numeric tier, which was done). **vani-ml** phased breakdown (v0.1.0 classical ML → v0.2.0 data utilities → v0.3.0 autodiff core → v0.4.0 layers/activations/losses → v0.5.0 optimizers → v0.6.0+ training-loop utilities/stretch) scoped 2026-07-25, all phases shipped and published, see [above](#ml-tier-complete-scoped-2026-07-25-shipped-2026-08-16). Both the symbolic and ML tiers are now closed; every planned repo in this document has shipped.
 11. **Hardware-acceleration tier -- NOT STARTED, scoped 2026-08-17 only.** Independent of every prior tier (no dependency on numeric/symbolic/ML). **vani-cuda** → **vani-rocm** → **vani-tensorrt** (DLA folds in as a config path), see [above](#planned-hardware-acceleration-tier-scoped-2026-08-17-not-started). Unlike every completed tier above, this one carries a real, material caveat before starting: no GPU exists in this environment to validate on, so "done" here can only mean "compiles and links," not "confirmed correct on hardware" -- **confirm intent explicitly before starting**, not just before each phase.
 
 ---

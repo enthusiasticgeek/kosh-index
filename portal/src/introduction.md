@@ -40,11 +40,12 @@ automatically — you never need to type the URL yourself.
 
 ## Available packages
 
-15 packages are published today, spanning linear algebra
+18 packages are published today, spanning linear algebra
 (`matrix`, `sparse`, `tensor`), calculus (`calculus`, `vectorcalc`,
-`pde`), algebra (`algebra`, `interval`, `complex`), applied math
-(`probability`, `optimize`, `geometry`, `signal`, `discrete`), and a
-minimal example template (`hello-kosh`).
+`pde`), algebra (`algebra`, `interval`, `complex`, `bignum`), applied math
+(`probability`, `optimize`, `geometry`, `signal`, `discrete`), symbolic
+math (`symbolic`), machine learning (`ml`), and a minimal example
+template (`hello-kosh`).
 
 Browse the full [Package Catalog](catalog.md) for versions,
 dependencies, and checksums -- that page is the source of truth;

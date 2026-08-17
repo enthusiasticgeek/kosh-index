@@ -61,7 +61,11 @@ Each line in `index/<name>.json`:
 
 v1: `enthusiasticgeek` is the sole publish authority.  
 Packages are first-come first-served by name.  
-SMT-verified packages carry `"verified": true` in the index entry.
+`vanic publish` refuses to publish a package with incomplete
+`#[bounded_stack]`/`#[wcet]` safety-attribute coverage (the
+`--allow-partial-safety-coverage` flag opts out of this gate) -- this
+is an attribute-coverage check, not a full SMT proof pass, and the
+index entry itself carries no separate "verified" field.
 
 Publisher access may be revoked or a publisher permanently blacklisted for
 violations of the [Publisher Agreement](PUBLISHER_AGREEMENT.md). Violation

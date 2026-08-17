@@ -4,7 +4,7 @@ Task list distilled from [`ROADMAP.md`](ROADMAP.md), which stays the source of
 truth for scope/rationale — this file is just the actionable checklist. Last
 distilled: 2026-08-16.
 
-> **Context**: the numeric/scientific tier (12 packages, every gap-analysis
+> **Context**: the numeric/scientific tier (14 packages, every gap-analysis
 > row, all 5 MAINT items), the symbolic tier, and the ML tier are all fully
 > shipped. Nothing planned in this document remains open.
 
