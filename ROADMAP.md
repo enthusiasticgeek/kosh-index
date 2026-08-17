@@ -1,6 +1,6 @@
 # Kosh Math Ecosystem Roadmap
 
-This tracks which **packages** should exist to give vāṇी broad mathematical library
+This tracks which **packages** should exist to give vāṇī broad mathematical library
 coverage — comparable to SciPy / Eigen / Armadillo / Boost.Math for the numeric tier,
 with an optional, much larger symbolic tier on top, plus an ML tier built on both.
 `catalog.md` lists what's actually published right now; this file is the
@@ -106,7 +106,7 @@ BFS/DFS/Dijkstra/A*/cycle-detection/MST(Kruskal+Prim)/topo-sort (graphs),
 factorial/binomial/perm/fibonacci (combinatorics, counting only). **All
 7 gaps below shipped in vani-discrete v0.1.0 (2026-07-20)**, on the
 package's own adjacency-matrix encoding (the builtin `Graph` type is
-opaque from vāṇी source, so these couldn't be built on top of it):
+opaque from vāṇī source, so these couldn't be built on top of it):
 
 | # | Gap | Notes |
 |---|---|---|
@@ -155,7 +155,7 @@ more commonly needed). Shipped as one package, `vani-interval`. Itemized:
 - **G1-G7** (graph algorithms + combinatorics enumeration) ✅ shipped in
   **vani-discrete v0.1.0** (2026-07-20) — its own adjacency-matrix
   representation, since the compiler's builtin `Graph` type is opaque from
-  vāṇी source (no accessor to enumerate edges/neighbors) and G1-G7
+  vāṇī source (no accessor to enumerate edges/neighbors) and G1-G7
   couldn't be built on top of it.
 - **N1-N2** (stiff/BVP ODE solvers) ✅ shipped in **vani-calculus v0.3.0**
   (2026-07-20) — same package, same `poly_*`/ODE conventions, no new
@@ -197,7 +197,7 @@ that sequence.
 | 7 | ~~**vani-pde**~~ ✅ shipped 2026-07-20 | matrix | Finite-difference solvers for classic PDEs (heat/wave/Laplace equation) on a 1D/2D grid, Dirichlet BCs, explicit time marching for heat/wave, direct dense solve via mat_solve for Laplace/Poisson. Shipped without a vani-calculus dependency -- no natural reuse point was found (see vani-pde's README "Design decisions"). | 21 functions |
 | 8 | ~~**vani-algebra**~~ ✅ shipped 2026-07-20 | matrix, calculus (reuses poly_* ops) | Polynomial root-finding: closed-form cubic, general real-root finder for degree >= 4 (companion matrix + mat_eig_power + synthetic deflation, not a hand-derived quartic closed form -- see package README), nonlinear equation systems via Newton-Raphson. Real roots only. | 11 functions |
 | 9 | ~~**vani-sparse**~~ ✅ shipped 2026-07-20 | matrix (test/interop only) | Sparse matrix formats (COO to build, CSR to operate on) and core ops -- matvec, transpose, scale, add, matmul (Gustavson's algorithm). Filled the "Linear algebra — sparse matrices" gap-analysis row; added after the original 8-item sequence was already complete. | 17 functions |
-| 10 | ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 | calculus | Gradient/divergence/curl/Laplacian (2D/3D, central finite differences) and double/triple/line integrals via nested reuse of calculus's integrate_simpson (no closures in vāṇी, so integration reuses pre-sampled Vec<f64> instead of a captured function pointer). Filled the "Calculus — vector" gap-analysis row. | 11 functions |
+| 10 | ~~**vani-vectorcalc**~~ ✅ shipped 2026-07-20 | calculus | Gradient/divergence/curl/Laplacian (2D/3D, central finite differences) and double/triple/line integrals via nested reuse of calculus's integrate_simpson (no closures in vāṇī, so integration reuses pre-sampled Vec<f64> instead of a captured function pointer). Filled the "Calculus — vector" gap-analysis row. | 11 functions |
 
 ## Planned: symbolic tier (optional, separate scope)
 
@@ -224,7 +224,7 @@ this document combined.
 **Architecture decision: flat arena, not a recursive `Box<Self>` tree.**
 The obvious design -- `enum Expr { Num(i64), Add(Box<Expr>, Box<Expr>), ... }`,
 the standard shape in Rust/Lisp-family CAS toy implementations -- **does not
-compile in vāṇी today**, confirmed by direct test while scoping this package.
+compile in vāṇī today**, confirmed by direct test while scoping this package.
 Two independent compiler restrictions each block it on their own: enum
 variants admit only a single payload field in v1 (so a two-child variant is
 rejected outright), and `box()`'s admitted payload types don't include a
@@ -306,7 +306,7 @@ single repo rather than as separate repos.
 
 An autodiff engine needs *something* like a differentiable computation
 graph. The naive design -- closures that capture a mutable gradient
-buffer by reference -- **does not compile in vāṇी today**: closures with
+buffer by reference -- **does not compile in vāṇī today**: closures with
 move/Copy captures and full `FnOnce` semantics for non-Copy captures
 shipped 2026-07-15, but *ref-capturing* closures are explicitly out of
 scope, filed under `docs/missing_features.md`'s "Lifetime variables"
@@ -366,7 +366,7 @@ the symbolic tier -- this is a scoping breakdown, not a start signal.
 
 A fourth tier, orthogonal to numeric/symbolic/ML above: GPU-accelerated
 math via `extern "C"` FFI bindings to vendor SDKs (CUDA, ROCm, TensorRT),
-not new vāṇी-native algorithms. Asked directly: "how would you approach
+not new vāṇī-native algorithms. Asked directly: "how would you approach
 hardware-accelerated math (CUDA, TensorRT, DLA, ROCm)?" -- this section
 is that answer, scoped and estimated, not yet started.
 
@@ -398,7 +398,7 @@ against the FFI ABI rules already documented in
   (`09a_ffi_primer.md`'s "Function pointers" section) -- lower priority
   here since the CUDA/HIP Runtime APIs are call-in, not callback-driven,
   but relevant if a driver-level API is bound later.
-- **What genuinely can't be done, independent of FFI capability**: vāṇी
+- **What genuinely can't be done, independent of FFI capability**: vāṇī
   itself can never emit GPU device code (no PTX/SPIR-V/HSA backend
   exists or is planned -- see `docs/missing_features.md`'s new "GPU /
   hardware-accelerated math" entry). Kernels stay written in CUDA C/C++
@@ -431,9 +431,9 @@ GPU access or to accept that caveat explicitly, not silently.
 
 | Repo | Depends on | Scope | Risk / notes |
 |---|---|---|---|
-| **vani-cuda** | none (vendors nothing -- links against the system CUDA Toolkit's headers/libs, not a Kosh dependency) | Host-side CUDA Runtime API bindings: `cuda_malloc`/`cuda_free`/`cuda_memcpy_h2d`/`cuda_memcpy_d2h`/`cuda_memset`/`cuda_device_synchronize`/basic stream + event functions, `cuda_launch_kernel` wrapping `cudaLaunchKernel` (NOT the `<<<...>>>` syntax, which is a CUDA C++ extension, not plain C-ABI). Device pointers as opaque `i64` handles. Ships with a small starter set of pre-compiled `.cu` kernels (vector add, SAXPY, a naive matmul) as `examples/`, not as the package's real scope -- callers are expected to bring their own kernels for anything beyond the starter set. | Medium. Mechanical FFI-declaration writing (~20-30 functions) once the i64-handle convention is settled, comparable in shape to a "new numeric repo." The real risk isn't the vāṇी side, it's the **untestable-on-real-hardware** constraint above -- treat as "compiles + links clean" verified, not "confirmed correct," until run on real hardware. |
+| **vani-cuda** | none (vendors nothing -- links against the system CUDA Toolkit's headers/libs, not a Kosh dependency) | Host-side CUDA Runtime API bindings: `cuda_malloc`/`cuda_free`/`cuda_memcpy_h2d`/`cuda_memcpy_d2h`/`cuda_memset`/`cuda_device_synchronize`/basic stream + event functions, `cuda_launch_kernel` wrapping `cudaLaunchKernel` (NOT the `<<<...>>>` syntax, which is a CUDA C++ extension, not plain C-ABI). Device pointers as opaque `i64` handles. Ships with a small starter set of pre-compiled `.cu` kernels (vector add, SAXPY, a naive matmul) as `examples/`, not as the package's real scope -- callers are expected to bring their own kernels for anything beyond the starter set. | Medium. Mechanical FFI-declaration writing (~20-30 functions) once the i64-handle convention is settled, comparable in shape to a "new numeric repo." The real risk isn't the vāṇī side, it's the **untestable-on-real-hardware** constraint above -- treat as "compiles + links clean" verified, not "confirmed correct," until run on real hardware. |
 | **vani-rocm** | none (same as vani-cuda, links against ROCm/HIP) | Same shape as vani-cuda -- HIP's API is deliberately CUDA-API-compatible (`hipMalloc`/`hipMemcpy` mirror `cudaMalloc`/`cudaMemcpy` almost 1:1), so this largely reuses vani-cuda's binding pattern and i64-handle convention rather than being a separate design problem. | Low-Medium once vani-cuda's pattern is proven -- mostly find-and-adapt, not new design. Same untestable-on-real-hardware caveat (needs AMD hardware instead of NVIDIA). |
-| **vani-tensorrt** (DLA folds in here, not a separate repo) | none directly, though a real user's model/weights come from elsewhere | Inference only (no training). TensorRT's public API is C++-object-shaped (builder/network/parser/config/engine/execution-context lifecycle), not plain C like the Runtime API -- needs a **hand-written C shim layer wrapping the C++ objects as opaque handles + free functions** before vāṇी bindings can attach at all, which is real, non-trivial per-function shim-writing work, not just declaration-writing. DLA is not a separate binding surface -- it's a TensorRT execution-provider config flag (`setDeviceType(DLA)` on the builder config); once vani-tensorrt exists, "DLA support" is a documented config path through it, not new scope. | Medium-High -- comparable in risk shape to the ML tier's autodiff-core phase (a new architectural pattern for this ecosystem, the C++-shim layer, not just more of an existing pattern) and the CAS tier's flagged-High-risk phases. Most likely of the three to need real iteration against actual TensorRT behavior rather than specing cleanly from docs alone, on top of the same untestable-on-real-hardware constraint (needs an actual TensorRT-supported GPU or Jetson/DLA board). |
+| **vani-tensorrt** (DLA folds in here, not a separate repo) | none directly, though a real user's model/weights come from elsewhere | Inference only (no training). TensorRT's public API is C++-object-shaped (builder/network/parser/config/engine/execution-context lifecycle), not plain C like the Runtime API -- needs a **hand-written C shim layer wrapping the C++ objects as opaque handles + free functions** before vāṇī bindings can attach at all, which is real, non-trivial per-function shim-writing work, not just declaration-writing. DLA is not a separate binding surface -- it's a TensorRT execution-provider config flag (`setDeviceType(DLA)` on the builder config); once vani-tensorrt exists, "DLA support" is a documented config path through it, not new scope. | Medium-High -- comparable in risk shape to the ML tier's autodiff-core phase (a new architectural pattern for this ecosystem, the C++-shim layer, not just more of an existing pattern) and the CAS tier's flagged-High-risk phases. Most likely of the three to need real iteration against actual TensorRT behavior rather than specing cleanly from docs alone, on top of the same untestable-on-real-hardware constraint (needs an actual TensorRT-supported GPU or Jetson/DLA board). |
 
 **Recommended order, if pursued**: vani-cuda first (proves the i64-handle
 FFI pattern and the "compiles clean, hardware-unverified" honesty
@@ -464,7 +464,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0, vani-interval | ~8-28 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), a stiff-system stability demonstration (calculus v0.3.0), and a rigorous-vs-linearized cross-check on the same problem plus a deliberate interval-arithmetic "dependency problem" test case (interval) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
 | **CAS tier** | ✅ vani-bignum; ✅ vani-symbolic full roadmap shipped 2026-08-16 (v0.1.0-v0.3.0, v0.5.0, v0.4.0, v0.6.0+ -- published as package versions 0.1.0-0.3.0, 0.5.0, 0.6.0, 0.7.0); vani-polyalgebra folded into vani-symbolic v0.6.0+, no separate repo, CLOSED | Turned out less open-ended than expected -- every phase shipped, including the flagged-High-risk v0.4.0 (integration) and the originally-open-ended v0.6.0+ (factorization). See the [`vani-symbolic` scoping breakdown](#vani-symbolic-scoping-breakdown-added-2026-07-24) above for the phase-by-phase risk profile and what each phase actually delivered. | v0.1.0 took ~1 unit. v0.2.0 (the flagged highest-risk phase) also landed at roughly ~1 unit -- the deliberate scope narrowing plus property-based validation kept it from ballooning. v0.3.0 (differentiation) landed at well under ~1 unit. v0.5.0 (equation solving) was genuinely Low as predicted -- thin layer over `vani-algebra`. v0.4.0 (integration, the flagged highest-risk remaining phase) landed clean on the first full test pass once scoped to polynomials only (dropping the roadmap's original `exp`/`ln`/`sin`/`cos` wording, a real-during-implementation scope correction, not a shortfall). v0.6.0+ (factorization) landed clean after one real bug (a zero-constant-term edge case) was caught by its own test suite on the first run. No phase in this tier ballooned past ~1 unit once scoped; the "open-ended" framing for v0.6.0+ turned out to be conservative given the deliberate rational-only, no-Gröbner-bases scope |
 | **ML tier** | ✅ vani-ml phased v0.1.0-v0.6.0+, all shipped 2026-08-16 | v0.1.0-v0.2.0 (classical ML + data utilities) were glue-shaped, close to the "New numeric repos" row above. v0.3.0 (autodiff core) was a new-architecture phase comparable in risk profile to `vani-symbolic`'s v0.2.0 -- validated via finite-difference gradient checking against every node kind, cross-checked against `vani-calculus::diff_central`. v0.4.0-v0.5.0 built directly on the graph without needing `vani-tensor`/`vani-matrix` (matmul emerges from composing existing scalar ops). v0.6.0+ closed out with a real 2-2-1 MLP trained on XOR converging to ~0.0001 loss on both backends -- the concrete validation signal its own "revisit once used" scope note was waiting for. See the [`vani-ml` scoping breakdown](#vani-ml-scoping-breakdown) above. | ~1 unit for v0.1.0-v0.2.0 combined; v0.3.0 landed close to the "Bigger numeric repo" estimate (~1.5-2 units); v0.4.0-v0.6.0+ landed at roughly ~0.5 unit each once v0.3.0's arena/traversal design was solid -- composing existing ops rather than adding new representations kept later phases cheaper than the original per-phase estimate |
-| **Hardware-acceleration tier** | ⬜ NOT STARTED -- `vani-cuda`, `vani-rocm`, `vani-tensorrt` (DLA folds into vani-tensorrt as a config path, no separate repo) | Pure FFI-binding work, no compiler prerequisite (confirmed against the existing FFI ABI rules + the SIMD shims' proven `ref Vec<T>` bulk-transfer pattern -- see the tier's own "Compiler-feature question resolved" section above). Unlike every other tier in this document, this one **can't be validated by real execution** in this environment -- no GPU, no self-hosted GPU runner -- so "shipped" here can only ever mean "compiles and links against the vendor SDK," not "confirmed correct on hardware," until whoever picks this up has real GPU access. | vani-cuda: ~1 unit (mechanical FFI declarations, "new numeric repo"-shaped, once the i64-opaque-device-pointer convention is settled). vani-rocm: ~0.5 unit once vani-cuda's pattern exists (HIP mirrors CUDA's API almost 1:1). vani-tensorrt: ~1.5-2 units, comparable to the ML tier's autodiff-core phase or the CAS tier's flagged-High-risk phases -- needs a hand-written C shim wrapping TensorRT's C++-object API before vāṇी bindings can attach at all, a genuinely new pattern for this ecosystem, not just more FFI declarations |
+| **Hardware-acceleration tier** | ⬜ NOT STARTED -- `vani-cuda`, `vani-rocm`, `vani-tensorrt` (DLA folds into vani-tensorrt as a config path, no separate repo) | Pure FFI-binding work, no compiler prerequisite (confirmed against the existing FFI ABI rules + the SIMD shims' proven `ref Vec<T>` bulk-transfer pattern -- see the tier's own "Compiler-feature question resolved" section above). Unlike every other tier in this document, this one **can't be validated by real execution** in this environment -- no GPU, no self-hosted GPU runner -- so "shipped" here can only ever mean "compiles and links against the vendor SDK," not "confirmed correct on hardware," until whoever picks this up has real GPU access. | vani-cuda: ~1 unit (mechanical FFI declarations, "new numeric repo"-shaped, once the i64-opaque-device-pointer convention is settled). vani-rocm: ~0.5 unit once vani-cuda's pattern exists (HIP mirrors CUDA's API almost 1:1). vani-tensorrt: ~1.5-2 units, comparable to the ML tier's autodiff-core phase or the CAS tier's flagged-High-risk phases -- needs a hand-written C shim wrapping TensorRT's C++-object API before vāṇī bindings can attach at all, a genuinely new pattern for this ecosystem, not just more FFI declarations |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
 each published package so far was validation, compiler-bug archaeology, and doc/registry
@@ -522,7 +522,7 @@ repos too.
   `[deps]` entry). New packages don't need to add the vendor `use` line at all; see
   [MAINT-2](#maintenance--audit-findings-added-2026-07-21) below for the cleanup pass
   on already-shipped packages.
-- **vāṇी has no `#[derive(...)]`.** `Eq`, print/debug formatting, cloning, etc. are
+- **vāṇī has no `#[derive(...)]`.** `Eq`, print/debug formatting, cloning, etc. are
   never auto-generated -- every non-Copy struct that needs equality gets a hand-written
   `implement Eq for T { fn eq(self: ref T, other: ref T) -> bool { ... } }` (Copy
   structs can take `self: T, other: T` by value instead). `vani-bignum`'s `BigInt`
@@ -547,7 +547,7 @@ uniformity, and import ergonomics — not new package scope, upkeep on what's sh
 | MAINT-2 | ~~Strip the now-redundant `use "../vendor/<dep>/src/lib.vani";` line from every shipped package that has one~~ ✅ done 2026-07-21 | ~15-30 min/package | **done, all 9** |
 | MAINT-3 | ~~`kosh_design.md`'s `vani.toml` example doesn't mention deps are auto-scoped~~ ✅ done 2026-07-21 | ~10 min | done |
 | MAINT-4 | ~~No sanity check enforced `#[bounded_stack]`/`#[wcet]` coverage before a package landed in kosh-index — MAINT-1 was a one-time manual pass with no lasting gate~~ ✅ done 2026-07-21, `vanic audit-safety` + `vanic publish` gate | ~1 session | **done** |
-| MAINT-5 | ~~No namespace boundary between packages — a name collision (with a vāṇी builtin, or between two unrelated packages) was an unrecoverable compile error, and a "diamond" shared dependency silently produced missing-function errors~~ ✅ done 2026-07-21, Kosh namespacing arc (6 phases) + full ecosystem migration | large, multi-session | **done, 12/12** |
+| MAINT-5 | ~~No namespace boundary between packages — a name collision (with a vāṇī builtin, or between two unrelated packages) was an unrecoverable compile error, and a "diamond" shared dependency silently produced missing-function errors~~ ✅ done 2026-07-21, Kosh namespacing arc (6 phases) + full ecosystem migration | large, multi-session | **done, 12/12** |
 
 **MAINT-1 methodology + progress (2026-07-21)**: vani-complex (24 functions, self-contained,
 no deps) done first as the pattern-setter. **Real finding that changes the original
@@ -634,7 +634,7 @@ All four fixed, republished: discrete 0.1.2, optimize 0.1.3, probability 0.4.5. 
 packages now pass `vanic audit-safety` cleanly.
 
 **MAINT-5 done (2026-07-21)**: sourced from a direct user question ("what happens if a
-kosh-index package has the same function name as a vāṇी built-in — namespace or
+kosh-index package has the same function name as a vāṇī built-in — namespace or
 modules?"). Testing the answer surfaced a second, more serious bug: a project depending
 on two packages that each vendor their own copy of a shared dependency (`probability` +
 `optimize`, both vendoring `matrix`) failed to compile with "unknown function" errors
@@ -656,7 +656,7 @@ for the complete design + verification writeup):
 - **Phase 3** — automatic per-package namespacing: every `[deps]` package is compiled
   inside its own `module <pkg_name> { ... }`, so its functions (and any exported struct
   types) are referenced as `pkgname::item` — the actual fix for the original question.
-  A dependency defining `fn abs(...)` no longer collides with the vāṇी builtin `abs`,
+  A dependency defining `fn abs(...)` no longer collides with the vāṇī builtin `abs`,
   or with any other package's `abs`, ever. Found and fixed a real parser gap along the
   way (module bodies had no support for `#[attr]`-prefixed items, needed by every real
   kosh package's `#[bounded_stack]`/`#[wcet]` annotations).

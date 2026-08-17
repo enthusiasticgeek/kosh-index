@@ -182,4 +182,4 @@ demonstrated **account compromise** can overturn these.
 
 ---
 
-*Enforcement Policy v1.0 — Vāṇी Kosh Registry — 2026-07-13*
+*Enforcement Policy v1.0 — Vāṇī Kosh Registry — 2026-07-13*

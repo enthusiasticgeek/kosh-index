@@ -8,7 +8,7 @@ All packages currently published to the Kosh registry.
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
 
-Dense linear algebra library for the vāṇी compiler. Matrices are flat
+Dense linear algebra library for the vāṇī compiler. Matrices are flat
 row-major `Vec<f64>` with explicit dimension arguments (no hidden metadata).
 
 Includes construction (`mat_zeros`/`mat_identity`/`mat_from_diag`),
@@ -34,7 +34,7 @@ matrix = { registry = "kosh", version = "^0.2" }
 
 **Version:** 0.3.1 &nbsp;|&nbsp; **Deps:** none
 
-Numerical calculus library for the vāṇी compiler.
+Numerical calculus library for the vāṇī compiler.
 
 Provides integration (trapezoidal, Simpson's, Romberg, Gauss-Legendre,
 adaptive), differentiation (central/forward/second difference, gradient,
@@ -65,7 +65,7 @@ calculus = { registry = "kosh", version = "^0.3" }
 
 **Version:** 0.4.7 &nbsp;|&nbsp; **Deps:** matrix ^0.1 (real registry dependency)
 
-Probability and statistics library for the vāṇी compiler.
+Probability and statistics library for the vāṇī compiler.
 
 Includes descriptive statistics (including quantiles, IQR, and mode),
 discrete and continuous distributions, correlation and OLS regression,
@@ -94,7 +94,7 @@ probability = { registry = "kosh", version = "^0.4.2" }
 
 **Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
-Complex number library for the vāṇी compiler. `Complex` is a plain
+Complex number library for the vāṇī compiler. `Complex` is a plain
 `{ re: f64, im: f64 }` struct (no heap-owning fields, so it's freely copyable --
 no `ref`/`mut ref` ceremony anywhere in this API, unlike the `Vec<f64>`-based
 sibling libraries).
@@ -117,7 +117,7 @@ complex = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.6 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
-Numerical optimization library for the vāṇी compiler.
+Numerical optimization library for the vāṇī compiler.
 
 Includes unconstrained gradient-based methods (fixed-step and
 Armijo-backtracking gradient descent, Newton's method with analytic or
@@ -141,7 +141,7 @@ optimize = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
 
-Computational and analytic geometry library for the vāṇी compiler.
+Computational and analytic geometry library for the vāṇī compiler.
 `Point2D`/`Point3D`/`Plane` are plain `f64`-field structs (freely copyable,
 same convention as `complex`'s `Complex`).
 
@@ -168,7 +168,7 @@ geometry = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.5 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
 
-Digital signal processing library for the vāṇी compiler. Time/sample-domain
+Digital signal processing library for the vāṇī compiler. Time/sample-domain
 data is `Vec<f64>`; frequency-domain data is `Vec<Complex>` (from `complex`).
 
 Includes naive DFT/IDFT (any length), Cooley-Tukey radix-2 FFT/IFFT (power-of-2
@@ -192,7 +192,7 @@ signal = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
-N-dimensional array library for the vāṇी compiler. A tensor is a flat
+N-dimensional array library for the vāṇī compiler. A tensor is a flat
 row-major `Vec<f64>` plus an explicit `Vec<i64>` shape (no hidden metadata) --
 a rank-2 tensor's data is byte-for-byte the same layout as a `matrix` matrix.
 
@@ -218,7 +218,7 @@ tensor = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
-Finite-difference PDE solver library for the vāṇी compiler. Grids are flat
+Finite-difference PDE solver library for the vāṇī compiler. Grids are flat
 row-major `Vec<f64>` (1D: length `n`; 2D: length `nx*ny`, same layout as a
 `matrix` matrix), Dirichlet boundary conditions only.
 
@@ -246,7 +246,7 @@ pde = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
 
-Polynomial root-finding and nonlinear equation system library for the vāṇी
+Polynomial root-finding and nonlinear equation system library for the vāṇī
 compiler. Polynomial coefficients are ascending `Vec<f64>`, matching
 `calculus`'s `poly_eval`/`poly_deriv_coeffs`/`poly_mul` convention.
 
@@ -274,7 +274,7 @@ algebra = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (test/interop only, not used by src/lib.vani itself)
 
-Sparse matrix format and operations library for the vāṇी compiler. Two
+Sparse matrix format and operations library for the vāṇī compiler. Two
 struct types: `SparseCOO` (easy to build incrementally) and `SparseCSR`
 (the efficient format every operation works on); a CSR matrix's dense form
 is byte-for-byte vani-matrix's row-major layout.
@@ -301,12 +301,12 @@ sparse = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** calculus ^0.2 (real registry dependency)
 
-Vector calculus library for the vāṇी compiler: gradient, divergence, curl,
+Vector calculus library for the vāṇī compiler: gradient, divergence, curl,
 Laplacian (2D and 3D, central finite differences), and double/triple/line
 integrals.
 
 Multi-dimensional integration reuses `calculus`'s `integrate_simpson` via
-pre-sampling instead of closures (vāṇी has no closures) -- see the
+pre-sampling instead of closures (vāṇī has no closures) -- see the
 package's own README for how. Validated against hand-computed closed
 forms plus two composed identities: `curl(grad f) = 0` for any scalar
 field, and the 2D divergence theorem on a square (double integral of
@@ -327,9 +327,9 @@ vectorcalc = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** none
 
-Graph algorithms and combinatorics enumeration library for the vāṇी
+Graph algorithms and combinatorics enumeration library for the vāṇī
 compiler. Uses its own flat row-major `Vec<f64>` adjacency-matrix encoding
-rather than the compiler's builtin `Graph` type, which is opaque from vāṇी
+rather than the compiler's builtin `Graph` type, which is opaque from vāṇī
 source (no accessor to enumerate edges/neighbors).
 
 Includes all-pairs shortest path (Floyd-Warshall), strongly-connected
@@ -356,7 +356,7 @@ discrete = { registry = "kosh", version = "^0.1" }
 **Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** none
 
 Rigorous interval arithmetic and first-order error propagation for
-the vāṇी compiler. Two distinct techniques share this package: interval
+the vāṇī compiler. Two distinct techniques share this package: interval
 arithmetic (`iv_*`), an `[lo, hi]` range provably containing the true
 value; and error propagation (`ep_*`), the linearized
 `σ_f ≈ sqrt(Σ(∂f/∂xi)²σxi²)` formula, which reuses `calculus`'s
@@ -391,10 +391,10 @@ interval = { registry = "kosh", version = "^0.1" }
 
 **Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
 
-Arbitrary-precision integer library for the vāṇी compiler -- numeric
+Arbitrary-precision integer library for the vāṇī compiler -- numeric
 foundation for the symbolic-math tier (`symbolic`, below). `BigInt` owns a `Vec<i64>`
 of base-1,000,000,000 (1e9) digit limbs (not Copy, unlike `complex`'s
-`Complex`), chosen because vāṇी has no integer type wider than `i64` and
+`Complex`), chosen because vāṇī has no integer type wider than `i64` and
 `+`/`-`/`*` trap on overflow rather than wrap.
 
 Includes construction/IO (from `i64`, from a decimal string, to a decimal
@@ -428,13 +428,13 @@ bignum = { registry = "kosh", version = "^0.2" }
 dependency, equation solving + factorization); calculus ^0.3
 (tests/examples-only cross-check, not a production dependency)
 
-Symbolic-math (CAS) foundation for the vāṇी compiler -- expression
+Symbolic-math (CAS) foundation for the vāṇī compiler -- expression
 construction, numeric evaluation, precedence-aware printing,
 simplification, differentiation, equation solving, integration, and
 polynomial factorization. The full roadmap shipped 2026-08-16.
 `ExprNode` is a Copy struct (four `i64` fields) living in a flat
 `Vec<ExprNode>` arena with `i64` child indices instead of pointers,
-chosen because a recursive `Box<Self>` enum doesn't compile in vāṇी
+chosen because a recursive `Box<Self>` enum doesn't compile in vāṇī
 today (single-payload-field enum restriction plus no self-referential
 `box()` payloads) -- the same workaround `ml`'s autodiff `GraphNode`
 arena reuses.
@@ -490,7 +490,7 @@ symbolic = { registry = "kosh", version = "^0.7" }
 
 **Version:** 0.6.0 &nbsp;|&nbsp; **Deps:** probability ^0.4, optimize ^0.1 (real registry dependencies)
 
-Machine learning library for the vāṇी compiler. Staged: classical ML
+Machine learning library for the vāṇī compiler. Staged: classical ML
 first (v0.1.0-v0.2.0), then a full autodiff/neural-net engine on top
 (v0.3.0-v0.6.0) -- the whole roadmap now shipped.
 

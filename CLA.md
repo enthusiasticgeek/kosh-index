@@ -1,6 +1,6 @@
 # Contributor License Agreement — Vāṇी Kosh Registry
 
-**Project**: Vāṇी Kosh Registry (`kosh-index`)
+**Project**: Vāṇī Kosh Registry (`kosh-index`)
 **Operator / Maintainer**: Pratik M. Tambe &lt;enthusiasticgeek@gmail.com&gt;
 **Agreement version**: 1.2 — 2026-07-10
 
@@ -22,7 +22,7 @@
 
 **"Contribution"** means any original work of authorship submitted by You for inclusion in the kosh-index repository — including changes to registry configuration, tooling, documentation, or governance files.
 
-**"Registry"** means the Vāṇी Kosh sparse index and associated infrastructure at <https://github.com/enthusiasticgeek/kosh-index>.
+**"Registry"** means the Vāṇī Kosh sparse index and associated infrastructure at <https://github.com/enthusiasticgeek/kosh-index>.
 
 **"Operator"** means Pratik M. Tambe, the current sole operator of the Registry.
 

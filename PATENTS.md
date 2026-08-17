@@ -1,6 +1,6 @@
 # Patent Policy — Vāṇी Kosh Registry
 
-**Project**: Vāṇी Kosh Registry (`kosh-index`)
+**Project**: Vāṇī Kosh Registry (`kosh-index`)
 **Operator**: Pratik M. Tambe &lt;enthusiasticgeek@gmail.com&gt;
 **Effective**: 2026-07-10
 
