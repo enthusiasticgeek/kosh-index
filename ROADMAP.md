@@ -362,6 +362,91 @@ the symbolic tier -- this is a scoping breakdown, not a start signal.
 
 ---
 
+## Planned: hardware-acceleration tier (scoped 2026-08-17, NOT STARTED)
+
+A fourth tier, orthogonal to numeric/symbolic/ML above: GPU-accelerated
+math via `extern "C"` FFI bindings to vendor SDKs (CUDA, ROCm, TensorRT),
+not new vāṇी-native algorithms. Asked directly: "how would you approach
+hardware-accelerated math (CUDA, TensorRT, DLA, ROCm)?" -- this section
+is that answer, scoped and estimated, not yet started.
+
+### Compiler-feature question resolved before scoping (2026-08-17)
+
+Same shape of question the ML tier's autodiff design faced: does this
+need a compiler feature that doesn't exist? **No** -- confirmed directly
+against the FFI ABI rules already documented in
+`vani-compiler/tutorials/src/intermediate/09a_ffi_primer.md` and
+`docs/simd_ffi_shims.md`, not assumed:
+
+- Scalars, `Str`, `ref T`/`mut ref T`, and `#[repr(C)]` structs (subject
+  to per-platform small-struct size caps) already cross the FFI boundary
+  cleanly -- no new ABI work needed for any GPU vendor API's ordinary
+  function signatures (`cudaMalloc`, `cudaMemcpy`, `cudaLaunchKernel`,
+  HIP's near-identical mirror of the same calls).
+- **Bulk buffer transfer is already proven**, not theoretical:
+  `docs/simd_ffi_shims.md`'s existing NEON/AVX2/RVV shims already pass
+  `ref Vec<i64>` as a contiguous C pointer across the boundary
+  (`neon_matmul(a: ref Vec<i64>, b: ref Vec<i64>, ...)`). A `cudaMemcpy`-
+  style host-side transfer binds the same way.
+- Raw pointer types (`*const T`/`*mut T`) do **not** cross the FFI
+  boundary in v1 (confirmed in `09a_ffi_primer.md`) -- device pointers
+  are represented as an opaque address-sized `i64` handle instead
+  (`mut ref i64` for an out-parameter, matching `cudaMalloc(void**,
+  size_t)`'s device-pointer-writeback slot). This is a naming
+  convention for the binding layer, not a compiler gap.
+- Function-pointer callback parameters already work
+  (`09a_ffi_primer.md`'s "Function pointers" section) -- lower priority
+  here since the CUDA/HIP Runtime APIs are call-in, not callback-driven,
+  but relevant if a driver-level API is bound later.
+- **What genuinely can't be done, independent of FFI capability**: vāṇी
+  itself can never emit GPU device code (no PTX/SPIR-V/HSA backend
+  exists or is planned -- see `docs/missing_features.md`'s new "GPU /
+  hardware-accelerated math" entry). Kernels stay written in CUDA C/C++
+  or HIP C++, compiled by the vendor's own toolchain (`nvcc`/`hipcc`),
+  and linked in via `--link-with`/`-l<name>` -- the package supplies the
+  host-side orchestration (allocate, copy, launch, synchronize, free),
+  not the device-side math.
+
+**Decision: no compiler prerequisite**, same conclusion the ML tier
+reached for ref-capturing closures -- this tier is pure Kosh-package
+FFI-binding work.
+
+### Real constraint this tier has that no prior tier did
+
+Every published package so far was validated by actually running it
+(hand-computed reference values, real `vanic test`/`vanic run` execution
+on both backends). **This environment has no GPU** -- CI runs on
+GitHub-hosted runners with no NVIDIA/AMD hardware, and there's no
+self-hosted GPU runner configured for this ecosystem. A `vani-cuda`/
+`vani-rocm`/`vani-tensorrt` package can be written, and can be confirmed
+to *compile and link* against the vendor SDK's headers, but genuine
+on-device execution can't be verified the way every other package in
+this roadmap was -- the honest status would be "implemented from the
+vendor's documented API contract, untested on real hardware," the same
+caveat this session already used for `cancel <name>;`'s Windows/macOS
+paths in `vani-compiler`. Whoever picks this tier up needs either real
+GPU access or to accept that caveat explicitly, not silently.
+
+### Scoping breakdown
+
+| Repo | Depends on | Scope | Risk / notes |
+|---|---|---|---|
+| **vani-cuda** | none (vendors nothing -- links against the system CUDA Toolkit's headers/libs, not a Kosh dependency) | Host-side CUDA Runtime API bindings: `cuda_malloc`/`cuda_free`/`cuda_memcpy_h2d`/`cuda_memcpy_d2h`/`cuda_memset`/`cuda_device_synchronize`/basic stream + event functions, `cuda_launch_kernel` wrapping `cudaLaunchKernel` (NOT the `<<<...>>>` syntax, which is a CUDA C++ extension, not plain C-ABI). Device pointers as opaque `i64` handles. Ships with a small starter set of pre-compiled `.cu` kernels (vector add, SAXPY, a naive matmul) as `examples/`, not as the package's real scope -- callers are expected to bring their own kernels for anything beyond the starter set. | Medium. Mechanical FFI-declaration writing (~20-30 functions) once the i64-handle convention is settled, comparable in shape to a "new numeric repo." The real risk isn't the vāṇी side, it's the **untestable-on-real-hardware** constraint above -- treat as "compiles + links clean" verified, not "confirmed correct," until run on real hardware. |
+| **vani-rocm** | none (same as vani-cuda, links against ROCm/HIP) | Same shape as vani-cuda -- HIP's API is deliberately CUDA-API-compatible (`hipMalloc`/`hipMemcpy` mirror `cudaMalloc`/`cudaMemcpy` almost 1:1), so this largely reuses vani-cuda's binding pattern and i64-handle convention rather than being a separate design problem. | Low-Medium once vani-cuda's pattern is proven -- mostly find-and-adapt, not new design. Same untestable-on-real-hardware caveat (needs AMD hardware instead of NVIDIA). |
+| **vani-tensorrt** (DLA folds in here, not a separate repo) | none directly, though a real user's model/weights come from elsewhere | Inference only (no training). TensorRT's public API is C++-object-shaped (builder/network/parser/config/engine/execution-context lifecycle), not plain C like the Runtime API -- needs a **hand-written C shim layer wrapping the C++ objects as opaque handles + free functions** before vāṇी bindings can attach at all, which is real, non-trivial per-function shim-writing work, not just declaration-writing. DLA is not a separate binding surface -- it's a TensorRT execution-provider config flag (`setDeviceType(DLA)` on the builder config); once vani-tensorrt exists, "DLA support" is a documented config path through it, not new scope. | Medium-High -- comparable in risk shape to the ML tier's autodiff-core phase (a new architectural pattern for this ecosystem, the C++-shim layer, not just more of an existing pattern) and the CAS tier's flagged-High-risk phases. Most likely of the three to need real iteration against actual TensorRT behavior rather than specing cleanly from docs alone, on top of the same untestable-on-real-hardware constraint (needs an actual TensorRT-supported GPU or Jetson/DLA board). |
+
+**Recommended order, if pursued**: vani-cuda first (proves the i64-handle
+FFI pattern and the "compiles clean, hardware-unverified" honesty
+convention this whole tier needs) → vani-rocm (cheap once vani-cuda's
+pattern exists) → vani-tensorrt (the C++-shim design question is
+genuinely separate work, don't start it expecting to reuse vani-cuda's
+binding style directly). **Confirm before starting** -- same rule as
+every other tier in this document; this is a scoping breakdown, not a
+start signal, and the real-hardware-verification gap above is a
+material reason to confirm intent before investing effort here.
+
+---
+
 ## Effort estimates
 
 Calibrated against what's actually happened building the published packages --
@@ -379,6 +464,7 @@ is now fully shipped, so this table doubles as a retrospective: the estimates he
 | **Gap-fill repos, requested separately** | ✅ vani-sparse, vani-vectorcalc, vani-discrete, vani-calculus v0.3.0, vani-interval | ~8-28 functions each; validated via cross-checks against dense vani-matrix ops (sparse), composed identities like curl(grad f)=0 and the divergence theorem (vectorcalc), the max-flow-min-cut theorem and enumeration totals against builtins (discrete), a stiff-system stability demonstration (calculus v0.3.0), and a rigorous-vs-linearized cross-check on the same problem plus a deliberate interval-arithmetic "dependency problem" test case (interval) -- composed/theorem checks throughout, not isolated hand-computed values alone | ~0.75-1 unit each |
 | **CAS tier** | ✅ vani-bignum; ✅ vani-symbolic full roadmap shipped 2026-08-16 (v0.1.0-v0.3.0, v0.5.0, v0.4.0, v0.6.0+ -- published as package versions 0.1.0-0.3.0, 0.5.0, 0.6.0, 0.7.0); vani-polyalgebra folded into vani-symbolic v0.6.0+, no separate repo, CLOSED | Turned out less open-ended than expected -- every phase shipped, including the flagged-High-risk v0.4.0 (integration) and the originally-open-ended v0.6.0+ (factorization). See the [`vani-symbolic` scoping breakdown](#vani-symbolic-scoping-breakdown-added-2026-07-24) above for the phase-by-phase risk profile and what each phase actually delivered. | v0.1.0 took ~1 unit. v0.2.0 (the flagged highest-risk phase) also landed at roughly ~1 unit -- the deliberate scope narrowing plus property-based validation kept it from ballooning. v0.3.0 (differentiation) landed at well under ~1 unit. v0.5.0 (equation solving) was genuinely Low as predicted -- thin layer over `vani-algebra`. v0.4.0 (integration, the flagged highest-risk remaining phase) landed clean on the first full test pass once scoped to polynomials only (dropping the roadmap's original `exp`/`ln`/`sin`/`cos` wording, a real-during-implementation scope correction, not a shortfall). v0.6.0+ (factorization) landed clean after one real bug (a zero-constant-term edge case) was caught by its own test suite on the first run. No phase in this tier ballooned past ~1 unit once scoped; the "open-ended" framing for v0.6.0+ turned out to be conservative given the deliberate rational-only, no-Gröbner-bases scope |
 | **ML tier** | ✅ vani-ml phased v0.1.0-v0.6.0+, all shipped 2026-08-16 | v0.1.0-v0.2.0 (classical ML + data utilities) were glue-shaped, close to the "New numeric repos" row above. v0.3.0 (autodiff core) was a new-architecture phase comparable in risk profile to `vani-symbolic`'s v0.2.0 -- validated via finite-difference gradient checking against every node kind, cross-checked against `vani-calculus::diff_central`. v0.4.0-v0.5.0 built directly on the graph without needing `vani-tensor`/`vani-matrix` (matmul emerges from composing existing scalar ops). v0.6.0+ closed out with a real 2-2-1 MLP trained on XOR converging to ~0.0001 loss on both backends -- the concrete validation signal its own "revisit once used" scope note was waiting for. See the [`vani-ml` scoping breakdown](#vani-ml-scoping-breakdown) above. | ~1 unit for v0.1.0-v0.2.0 combined; v0.3.0 landed close to the "Bigger numeric repo" estimate (~1.5-2 units); v0.4.0-v0.6.0+ landed at roughly ~0.5 unit each once v0.3.0's arena/traversal design was solid -- composing existing ops rather than adding new representations kept later phases cheaper than the original per-phase estimate |
+| **Hardware-acceleration tier** | ⬜ NOT STARTED -- `vani-cuda`, `vani-rocm`, `vani-tensorrt` (DLA folds into vani-tensorrt as a config path, no separate repo) | Pure FFI-binding work, no compiler prerequisite (confirmed against the existing FFI ABI rules + the SIMD shims' proven `ref Vec<T>` bulk-transfer pattern -- see the tier's own "Compiler-feature question resolved" section above). Unlike every other tier in this document, this one **can't be validated by real execution** in this environment -- no GPU, no self-hosted GPU runner -- so "shipped" here can only ever mean "compiles and links against the vendor SDK," not "confirmed correct on hardware," until whoever picks this up has real GPU access. | vani-cuda: ~1 unit (mechanical FFI declarations, "new numeric repo"-shaped, once the i64-opaque-device-pointer convention is settled). vani-rocm: ~0.5 unit once vani-cuda's pattern exists (HIP mirrors CUDA's API almost 1:1). vani-tensorrt: ~1.5-2 units, comparable to the ML tier's autodiff-core phase or the CAS tier's flagged-High-risk phases -- needs a hand-written C shim wrapping TensorRT's C++-object API before vāṇी bindings can attach at all, a genuinely new pattern for this ecosystem, not just more FFI declarations |
 
 "Unit" here is a relative measure, not a wall-clock estimate -- a lot of the effort in
 each published package so far was validation, compiler-bug archaeology, and doc/registry
@@ -399,6 +485,7 @@ repos too.
 8. ~~**vani-discrete**~~ ✅ shipped 2026-07-20 (G1-G7), ~~**vani-calculus v0.3.0**~~ ✅ shipped 2026-07-20 (N1-N2), and ~~**vani-interval**~~ ✅ shipped 2026-07-21 (N3) -- itemized follow-up gaps under the "mostly done" rows, each requested separately after step 7. Every itemized gap in this document is now shipped.
 9. ~~Symbolic tier~~ ✅ CLOSED 2026-08-16. ~~**vani-bignum**~~ ✅ shipped 2026-07-24 -- the exact-arithmetic foundation. **vani-symbolic** phased breakdown (v0.1.0 construction/print/eval → v0.2.0 simplification → v0.3.0 differentiation → v0.5.0 equation solving → v0.4.0 integration → v0.6.0+ polynomial factorization, folding in what would've been vani-polyalgebra) scoped 2026-07-24, all six phases shipped and published (as package versions 0.1.0-0.3.0, 0.5.0, 0.6.0, 0.7.0 -- package version numbers diverge from phase numbers because v0.5.0 published before v0.4.0), see [above](#vani-symbolic-scoping-breakdown-added-2026-07-24).
 10. ~~ML tier~~ ✅ CLOSED 2026-08-16, independent of the symbolic tier (depended only on the numeric tier, which was done). **vani-ml** phased breakdown (v0.1.0 classical ML → v0.2.0 data utilities → v0.3.0 autodiff core → v0.4.0 layers/activations/losses → v0.5.0 optimizers → v0.6.0+ training-loop utilities/stretch) scoped 2026-07-25, all phases shipped and published, see [above](#planned-ml-tier-scoped-2026-07-25). Both the symbolic and ML tiers are now closed; every planned repo in this document has shipped.
+11. **Hardware-acceleration tier -- NOT STARTED, scoped 2026-08-17 only.** Independent of every prior tier (no dependency on numeric/symbolic/ML). **vani-cuda** → **vani-rocm** → **vani-tensorrt** (DLA folds in as a config path), see [above](#planned-hardware-acceleration-tier-scoped-2026-08-17-not-started). Unlike every completed tier above, this one carries a real, material caveat before starting: no GPU exists in this environment to validate on, so "done" here can only mean "compiles and links," not "confirmed correct on hardware" -- **confirm intent explicitly before starting**, not just before each phase.
 
 ---
 
