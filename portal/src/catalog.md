@@ -115,7 +115,7 @@ complex = { registry = "kosh", version = "^0.1" }
 
 ## optimize
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+**Version:** 0.1.6 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
 Numerical optimization library for the vāṇी compiler.
 
@@ -128,6 +128,7 @@ tableau simplex linear-programming solver.
 
 - **Repository:** [enthusiasticgeek/vani-optimize](https://github.com/enthusiasticgeek/vani-optimize)
 - **Checksum (0.1.0):** `56db6d36…44b48`
+- **Checksum (0.1.6):** `22817b79…fcb2ed`
 
 ```toml
 [deps]
@@ -165,7 +166,7 @@ geometry = { registry = "kosh", version = "^0.1" }
 
 ## signal
 
-**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
+**Version:** 0.1.5 &nbsp;|&nbsp; **Deps:** complex ^0.1 (real registry dependency)
 
 Digital signal processing library for the vāṇी compiler. Time/sample-domain
 data is `Vec<f64>`; frequency-domain data is `Vec<Complex>` (from `complex`).
@@ -178,6 +179,7 @@ windowing, and numeric (trapezoidal) Laplace and Z transforms.
 
 - **Repository:** [enthusiasticgeek/vani-signal](https://github.com/enthusiasticgeek/vani-signal)
 - **Checksum (0.1.4):** `43fb2c64…a7a3293`
+- **Checksum (0.1.5):** `ace61620…59f111`
 
 ```toml
 [deps]
@@ -188,7 +190,7 @@ signal = { registry = "kosh", version = "^0.1" }
 
 ## tensor
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
 N-dimensional array library for the vāṇी compiler. A tensor is a flat
 row-major `Vec<f64>` plus an explicit `Vec<i64>` shape (no hidden metadata) --
@@ -203,6 +205,7 @@ row-major tensor's data is already exactly the matrix that function expects).
 
 - **Repository:** [enthusiasticgeek/vani-tensor](https://github.com/enthusiasticgeek/vani-tensor)
 - **Checksum (0.1.0):** `e6c2475c…16f56a`
+- **Checksum (0.1.4):** `567bf7a0…e2e777`
 
 ```toml
 [deps]
@@ -213,7 +216,7 @@ tensor = { registry = "kosh", version = "^0.1" }
 
 ## pde
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2 (real registry dependency)
 
 Finite-difference PDE solver library for the vāṇी compiler. Grids are flat
 row-major `Vec<f64>` (1D: length `n`; 2D: length `nx*ny`, same layout as a
@@ -230,6 +233,7 @@ output.
 
 - **Repository:** [enthusiasticgeek/vani-pde](https://github.com/enthusiasticgeek/vani-pde)
 - **Checksum (0.1.0):** `a1de34fd…7fdd3224`
+- **Checksum (0.1.4):** `34e7fccf…daa4c3`
 
 ```toml
 [deps]
@@ -240,7 +244,7 @@ pde = { registry = "kosh", version = "^0.1" }
 
 ## algebra
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** matrix ^0.2, calculus ^0.2 (real registry dependencies)
 
 Polynomial root-finding and nonlinear equation system library for the vāṇी
 compiler. Polynomial coefficients are ascending `Vec<f64>`, matching
@@ -257,6 +261,7 @@ at every step). Real roots only -- no complex-root support in v0.1.0.
 
 - **Repository:** [enthusiasticgeek/vani-algebra](https://github.com/enthusiasticgeek/vani-algebra)
 - **Checksum (0.1.0):** `c4f8f759…d42b169fdb`
+- **Checksum (0.1.4):** `14ab167a…9d7eac`
 
 ```toml
 [deps]
@@ -294,7 +299,7 @@ sparse = { registry = "kosh", version = "^0.1" }
 
 ## vectorcalc
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** calculus ^0.2 (real registry dependency)
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** calculus ^0.2 (real registry dependency)
 
 Vector calculus library for the vāṇी compiler: gradient, divergence, curl,
 Laplacian (2D and 3D, central finite differences), and double/triple/line
@@ -309,6 +314,7 @@ divergence equals the sum of outward flux across all four edges).
 
 - **Repository:** [enthusiasticgeek/vani-vectorcalc](https://github.com/enthusiasticgeek/vani-vectorcalc)
 - **Checksum (0.1.0):** `280173fa…7024967d1ab1661`
+- **Checksum (0.1.4):** `68f88155…ea3995`
 
 ```toml
 [deps]
@@ -319,7 +325,7 @@ vectorcalc = { registry = "kosh", version = "^0.1" }
 
 ## discrete
 
-**Version:** 0.1.0 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** none
 
 Graph algorithms and combinatorics enumeration library for the vāṇी
 compiler. Uses its own flat row-major `Vec<f64>` adjacency-matrix encoding
@@ -336,6 +342,7 @@ cross-checked against the compiler's `i64_factorial`/`i64_binomial`.
 
 - **Repository:** [enthusiasticgeek/vani-discrete](https://github.com/enthusiasticgeek/vani-discrete)
 - **Checksum (0.1.0):** `7fba0d10…7a7c21ecf60`
+- **Checksum (0.1.3):** `47d2ba94…4d2b62`
 
 ```toml
 [deps]
@@ -346,7 +353,7 @@ discrete = { registry = "kosh", version = "^0.1" }
 
 ## interval
 
-**Version:** 0.1.3 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.1.4 &nbsp;|&nbsp; **Deps:** none
 
 Rigorous interval arithmetic and first-order error propagation for
 the vāṇी compiler. Two distinct techniques share this package: interval
@@ -371,6 +378,7 @@ sums/products/quotients.
 - **Checksum (0.1.1):** `e79dfac2…08d0b43f3`
 - **Checksum (0.1.2):** `1d004b40…2897cc227`
 - **Checksum (0.1.3):** `104ce8cf…16540ed92`
+- **Checksum (0.1.4):** `3579ca9b…9b6c74`
 
 ```toml
 [deps]
@@ -381,7 +389,7 @@ interval = { registry = "kosh", version = "^0.1" }
 
 ## bignum
 
-**Version:** 0.1.2 &nbsp;|&nbsp; **Deps:** none
+**Version:** 0.2.0 &nbsp;|&nbsp; **Deps:** none
 
 Arbitrary-precision integer library for the vāṇी compiler -- numeric
 foundation for the symbolic-math tier (`symbolic`, below). `BigInt` owns a `Vec<i64>`
@@ -398,14 +406,18 @@ division/modulo (long division, binary-searching each quotient digit
 against the running remainder), GCD (Euclidean algorithm), and
 exponentiation -- `bn_pow_i64` (squaring) and `bn_pow_mod` (modular,
 reducing after every multiply so intermediates stay bounded by the
-modulus) (0.1.2). Integers only -- rational numbers are planned for v0.2.0.
+modulus) (0.1.2). A full `Rational` type as of v0.2.0: `struct Rational
+{ num: BigInt, den: BigInt }`, always kept in lowest terms via a smart
+constructor (`bn_gcd` reduction + sign normalization onto the
+denominator), with arithmetic, comparison, and string conversion.
 
 - **Repository:** [enthusiasticgeek/vani-bignum](https://github.com/enthusiasticgeek/vani-bignum)
 - **Checksum (0.1.2):** `f16d692c…e4e12b2`
+- **Checksum (0.2.0):** `28a11584…82276b`
 
 ```toml
 [deps]
-bignum = { registry = "kosh", version = "^0.1" }
+bignum = { registry = "kosh", version = "^0.2" }
 ```
 
 ---
