@@ -389,13 +389,25 @@ deliberately pending real-hardware testing, not because anything failed:
 | [`vani-rocm`](https://github.com/enthusiasticgeek/vani-rocm) | ✅ v0.1.0 implemented, pushed, tutorial site live | ⬜ not published |
 | [`vani-tensorrt`](https://github.com/enthusiasticgeek/vani-tensorrt) | ✅ v0.1.0 implemented, pushed, tutorial site live | ⬜ not published |
 
+All three target **2026-era SDKs and GPU generations exclusively, by
+explicit design direction -- no backward compatibility with older
+CUDA/ROCm/TensorRT releases, and no note is made when a function might
+not work on older hardware beyond "it may or may not."** `vani-cuda`/
+`vani-rocm` add the stream-ordered async allocator
+(`cuda_malloc_async`/`hip_malloc_async` etc., 32 functions each) as
+the modern recommended pattern alongside the classic synchronous one.
+`vani-tensorrt` was fully rewritten from its original, deliberately
+version-hedged design (the OLDER, now-removed positional-"bindings"
+TensorRT API) to bind ONLY TensorRT 10+'s current tensor-name-based
+execution API (`setTensorAddress`/`enqueueV3`, 15 functions) -- older
+TensorRT releases are not supported at all, by design, not by gap.
+
 Each repo's own README has the full, honest verification-status
 writeup -- summarized: `vani-cuda`/`vani-rocm` are "compiles clean,
 codegen-verified, hardware-unverified" (no GPU in this environment);
 `vani-tensorrt` carries a second, larger layer of risk on top of that
-(no TensorRT SDK was even available to compile-check the shim against
-at all, and it targets one specific TensorRT API generation that newer
-10.x releases partially deprecated). Building these surfaced two real
+-- no TensorRT SDK was even available to compile-check the shim
+against at all in this environment. Building these surfaced two real
 `vani-compiler` packaging fixes along the way: `vanic publish`'s
 tarball builder silently dropped native FFI shim source files
 (`.c`/`.h`/`.cu`/`.cuh`/`.cpp`/`.hpp`) before commits `9cc8108e` and
