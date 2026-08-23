@@ -211,3 +211,21 @@ per phase are in ROADMAP.md's
   during MAINT-1). This is a `vani-compiler`-side issue, not a kosh-index
   package gap — see `vani-compiler/docs/` for status before picking it up
   from this side.
+- **`vanic test` reported every package's `src/lib.vani` as a spurious
+  "failed" test** (2026-08-23 ecosystem audit) — a `vani-compiler`-side bug
+  in Test-fw Phase E's file-discovery logic (a library file with neither
+  `#[test]` fns nor `fn main` fell through to "Legacy" mode, which requires
+  `fn main` and so always failed). Fixed upstream as BUG-226; no package
+  changes needed here, and no package's actual test results were ever
+  wrong — only the summary count was inflated by one spurious failure per
+  package. Confirmed fixed against `vani-bignum`/`vani-matrix`/
+  `vani-calculus`/`vani-symbolic`/`vani-ml`.
+- **`vani-symbolic` and `vani-ml` hang under full SMT verification**
+  (2026-08-23, same audit) — `vanic check`/`vanic test` without
+  `VANIC_NO_VERIFY=1` doesn't return in a reasonable time on at least
+  `vani-symbolic/tests/test_construction.vani`; confirmed `VANIC_NO_VERIFY=1`
+  works around it (197 tests pass in seconds). Same class of issue as the
+  already-known `vani-pde`/`vani-probability` slow-SMT case (see
+  `reference_vani_smt_verifier_slow_on_some_kosh_packages` — not
+  root-caused there either). Not investigated further this pass; a
+  `vani-compiler`-side Z3-performance issue, not a kosh-index package gap.
