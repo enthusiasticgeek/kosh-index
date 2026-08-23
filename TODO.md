@@ -220,12 +220,26 @@ per phase are in ROADMAP.md's
   wrong — only the summary count was inflated by one spurious failure per
   package. Confirmed fixed against `vani-bignum`/`vani-matrix`/
   `vani-calculus`/`vani-symbolic`/`vani-ml`.
-- **`vani-symbolic` and `vani-ml` hang under full SMT verification**
-  (2026-08-23, same audit) — `vanic check`/`vanic test` without
-  `VANIC_NO_VERIFY=1` doesn't return in a reasonable time on at least
-  `vani-symbolic/tests/test_construction.vani`; confirmed `VANIC_NO_VERIFY=1`
-  works around it (197 tests pass in seconds). Same class of issue as the
-  already-known `vani-pde`/`vani-probability` slow-SMT case (see
-  `reference_vani_smt_verifier_slow_on_some_kosh_packages` — not
-  root-caused there either). Not investigated further this pass; a
-  `vani-compiler`-side Z3-performance issue, not a kosh-index package gap.
+- ~~**`vani-symbolic` and `vani-ml` hang under full SMT verification**~~
+  ✅ root-caused and fixed upstream as BUG-226's follow-up, BUG-227
+  (2026-08-23). Two independent `vani-compiler` bugs, not a kosh-index
+  package gap: (1) the checker forwarded every accumulated SMT fact in a
+  function to every later proof with no relevance filtering, so one
+  expensive `f64`-division fact (`vani-matrix`'s `mat_inv_3x3`) got
+  re-solved by z3 on every subsequent bounds-check in the same function
+  (~30s for one function); (2) the SMT query cache (keyed on exact query
+  text) was silently defeated by a `HashSet`-ordered axiom list producing
+  non-deterministic query text across `vanic test`'s worker threads,
+  forcing every shared-library function to be re-solved once per file
+  that used it instead of once total. Both fixed in `vani-compiler`
+  (`filter_relevant_facts` + `BTreeSet` ordering). Verified: `vani-symbolic`
+  (197 tests) and `vani-ml` (31 tests) now both pass under full
+  verification with **no `VANIC_NO_VERIFY=1`** — previously an indefinite
+  hang, now ~2 minutes each. Also re-tested the previously-separate
+  `vani-pde`/`vani-probability` slow-SMT case (see
+  `reference_vani_smt_verifier_slow_on_some_kosh_packages`) with the
+  fixed compiler: same root cause, now also fixed — `vani-pde` (16 tests,
+  1m0s) and `vani-probability` (178 tests, 3m14s) both pass under full
+  verification with no `VANIC_NO_VERIFY=1`. The
+  `reference_vani_smt_verifier_slow_on_some_kosh_packages` memory is now
+  stale; all four packages it named are confirmed fixed.
