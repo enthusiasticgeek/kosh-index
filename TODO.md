@@ -243,3 +243,18 @@ per phase are in ROADMAP.md's
   verification with no `VANIC_NO_VERIFY=1`. The
   `reference_vani_smt_verifier_slow_on_some_kosh_packages` memory is now
   stale; all four packages it named are confirmed fixed.
+- **Full-ecosystem sweep for the same BUG-227 pattern (2026-08-23)** —
+  after fixing BUG-227, ran `vanic test` (full SMT verification, no
+  `VANIC_NO_VERIFY=1`) against every remaining kosh package to check for
+  other occurrences. Clean across the board, nothing else found:
+  `vani-bignum` (7s, 8 passed), `vani-calculus` (60s, 69 passed),
+  `vani-complex` (4s, 4 passed), `vani-discrete` (7s, 5 passed),
+  `vani-geometry` (30s, 5 passed), `vani-interval` (85s, 69 passed),
+  `vani-optimize` (81s, 17 passed), `vani-signal` (14s, 9 passed),
+  `vani-sparse` (33s, 15 passed), `vani-tensor` (35s, 16 passed),
+  `vani-vectorcalc` (1m48s, 58 passed), `vani-algebra` (1m15s,
+  84 passed). `vani-cuda`/`vani-rocm`/`vani-tensorrt` compile+verify in
+  ~4s each; their `tests/` only fail at the JIT link step for missing
+  real GPU/CUDA/ROCm/TensorRT runtimes on this machine, unrelated to
+  SMT and expected without the hardware. Timings all track package size
+  / dependency depth as expected, no disproportionate blowup anywhere.
